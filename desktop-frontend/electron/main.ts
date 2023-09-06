@@ -1,11 +1,11 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, desktopCapturer, ipcMain } = require('electron')
 const io = require("socket.io-client");
 import path from 'node:path'
 
 process.env.DIST = path.join(__dirname, '../dist')
 process.env.PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
 
-let win: BrowserWindow | null
+let win: BrowserWindow | null;
 let socket: any;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
@@ -40,6 +40,15 @@ app.whenReady().then(()=>{
     win.webContents.send('displayEmitAlert', msg);
   })
 
+  desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
+    for (const source of sources) {
+      if (source.name === 'Entire screen') {
+        win.webContents.send('SET_SOURCE', source.id)
+        return
+      }
+    }
+  })
+
 })
 
 // Renderer to main
@@ -59,6 +68,3 @@ ipcMain.handle("mainSocketTest", async () => {
   console.log("Emitting event socket!");
   socket.emit("emit-test", "This is an emitted string literal!");
 })
-
-
-

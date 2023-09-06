@@ -21,6 +21,7 @@ function App() {
       >
         Test electron-react application
       </h1>
+      <audio className="tempAudioHolder" controls></audio>
     </>
   );
 }
