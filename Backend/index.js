@@ -12,7 +12,7 @@ Allowed origins list does not seem to be required to esablish a socket io connec
 
 const allowedOrigins = [
     "http://localhost:5173",
-    "http://localhost:5173/"
+    "http://localhost:5173/",
 ]
 
 const corsOptions = {
@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
         console.log(msg);
     })
 
-    console.log('a user connected');
+    console.log('a user connected --------------');
 });
 
 server.listen(8010, () => {

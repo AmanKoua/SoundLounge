@@ -34,11 +34,11 @@ app.on('window-all-closed', () => {
 app.whenReady().then(()=>{
   createWindow();
 
-  socket = io("http://localhost:8010");
+  // socket = io("http://localhost:8010");
 
-  socket.on("server-emit-test", (msg) => {
-    win.webContents.send('displayEmitAlert', msg);
-  })
+  // socket.on("server-emit-test", (msg) => {
+  //   win.webContents.send('displayEmitAlert', msg);
+  // })
 
   win.webContents.send('SET_SOURCE');
 
@@ -57,8 +57,9 @@ ipcMain.handle("mainTest", async () => {
 });
 
 ipcMain.handle("mainSocketTest", async () => {
-  console.log("Emitting event socket!");
-  socket.emit("emit-test", "This is an emitted string literal!");
+  // console.log("Emitting event socket!");
+  // socket.emit("emit-test", "This is an emitted string literal!");
+
 })
 
 ipcMain.on("receive-desktop-stream", (event,stream) => {
