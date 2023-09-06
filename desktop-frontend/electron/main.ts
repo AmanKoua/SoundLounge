@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const io = require("socket.io-client");
 import path from 'node:path'
 
 process.env.DIST = path.join(__dirname, '../dist')
@@ -31,6 +32,7 @@ app.on('window-all-closed', () => {
 })
 
 app.whenReady().then(()=>{
+  const socket = io("http://localhost:8010");
   createWindow();
 })
 
