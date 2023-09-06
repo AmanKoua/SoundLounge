@@ -42,10 +42,15 @@ app.whenReady().then(()=>{
 
   desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
     for (const source of sources) {
-      if (source.name === 'Entire screen') {
-        win.webContents.send('SET_SOURCE', source.id)
-        return
+
+      if(!source.name.includes("Google Chrome")){
+        continue;
       }
+
+      console.log(source.name);
+      win.webContents.send('SET_SOURCE', source.id)
+      return;
+
     }
   })
 

@@ -11,22 +11,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
 })
 
 ipcRenderer.on('SET_SOURCE', async (event, sourceId) => {
-  try {
-    const audioStream = await navigator.mediaDevices.getUserMedia({
-      // Audio settings are temporary and for testing!
-      // audio: {
-      //   mandatory: {
-      //     chromeMediaSource: 'desktop',
-      //     // chromeMediaSourceId: sourceId, // sourceId might not be necessary
-      //   }
-      // },
-      audio: true,
-      video: false,
-    })
-    handleStream(audioStream)
-  } catch (e) {
-    handleError(e)
-  }
+
+  // let devices = await navigator.mediaDevices.enumerateDevices();
+
+  // for(let i = 0; i < devices.length; i++){
+  //   console.log(devices[i].label, devices[i].deviceId);
+  // }
+
+  setTimeout(async()=>{
+    try {
+      const audioStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          mandatory: {
+            chromeMediaSource: 'desktop'
+          }
+        },
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop'
+          }
+        }
+      })
+      handleStream(audioStream)
+    } catch (e) {
+      handleError(e)
+    }
+
+  }, 1000)
+
+
 })
 
 function handleStream (audioStream) {
