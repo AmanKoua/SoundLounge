@@ -40,24 +40,11 @@ app.whenReady().then(()=>{
     win.webContents.send('displayEmitAlert', msg);
   })
 
-  desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-    for (const source of sources) {
-
-      if(!source.name.includes("Google Chrome")){
-        continue;
-      }
-
-      console.log(source.name);
-      win.webContents.send('SET_SOURCE', source.id)
-      return;
-
-    }
-  })
+  win.webContents.send('SET_SOURCE');
 
 })
 
 // Renderer to main
-
 ipcMain.handle("mainTest", async () => {
   console.log("Fetching from backend!");
 
@@ -72,4 +59,9 @@ ipcMain.handle("mainTest", async () => {
 ipcMain.handle("mainSocketTest", async () => {
   console.log("Emitting event socket!");
   socket.emit("emit-test", "This is an emitted string literal!");
+})
+
+ipcMain.on("receive-desktop-stream", (event,stream) => {
+  console.log("Stream in main process!");
+  console.log(stream);
 })

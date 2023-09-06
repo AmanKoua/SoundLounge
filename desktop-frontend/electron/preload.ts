@@ -4,20 +4,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Renderer to main
   triggerMainMessage: () => ipcRenderer.invoke('mainTest'),
   triggerEmitTest: () => ipcRenderer.invoke("mainSocketTest"),
+  sendDesktopMediaStream: (stream: any) => ipcRenderer.send("receive-desktop-stream", stream),
 
   // Main to renderer
   triggerRenderAlert: (callback) => ipcRenderer.on('displayAlert', callback),
   triggerEmitAlert: (callback) => ipcRenderer.on('displayEmitAlert', callback),
 })
 
-ipcRenderer.on('SET_SOURCE', async (event, sourceId) => {
-
-  // let devices = await navigator.mediaDevices.enumerateDevices();
-
-  // for(let i = 0; i < devices.length; i++){
-  //   console.log(devices[i].label, devices[i].deviceId);
-  // }
-
+ipcRenderer.on('SET_SOURCE', (event) => {
   setTimeout(async()=>{
     try {
       const audioStream = await navigator.mediaDevices.getUserMedia({
@@ -37,15 +31,12 @@ ipcRenderer.on('SET_SOURCE', async (event, sourceId) => {
       handleError(e)
     }
 
-  }, 1000)
-
-
+  }, 500)
 })
 
 function handleStream (audioStream) {
   let temp = document.getElementsByClassName("tempAudioHolder")[0];
   temp.srcObject = audioStream;
-  console.log(temp);
 }
 
 function handleError (e) {
