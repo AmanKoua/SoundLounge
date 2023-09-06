@@ -5,8 +5,8 @@ import path from 'node:path'
 process.env.DIST = path.join(__dirname, '../dist')
 process.env.PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
 
-
 let win: BrowserWindow | null
+let socket: any;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
@@ -32,8 +32,14 @@ app.on('window-all-closed', () => {
 })
 
 app.whenReady().then(()=>{
-  const socket = io("http://localhost:8010");
   createWindow();
+
+  socket = io("http://localhost:8010");
+
+  socket.on("server-emit-test", (msg) => {
+    win.webContents.send('displayEmitAlert', msg);
+  })
+
 })
 
 // Renderer to main
@@ -49,6 +55,10 @@ ipcMain.handle("mainTest", async () => {
 
 });
 
+ipcMain.handle("mainSocketTest", async () => {
+  console.log("Emitting event socket!");
+  socket.emit("emit-test", "This is an emitted string literal!");
+})
 
 
 

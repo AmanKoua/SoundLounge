@@ -5,13 +5,18 @@ function App() {
     window.electronAPI.triggerRenderAlert((event, value) => {
       alert(value);
     });
+
+    window.electronAPI.triggerEmitAlert((event, value) => {
+      alert(value);
+    });
   }, []);
 
   return (
     <>
       <h1
         onClick={() => {
-          window.electronAPI.triggerMainMessage();
+          // window.electronAPI.triggerMainMessage();
+          window.electronAPI.triggerEmitTest();
         }}
       >
         Test electron-react application

@@ -6,6 +6,10 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+/*
+Allowed origins list does not seem to be required to esablish a socket io connection.
+*/
+
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5173/"
@@ -22,6 +26,12 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+
+    socket.on("emit-test", (msg) => {
+        io.emit("server-emit-test", "This is an emission from the server!");
+        console.log(msg);
+    })
+
     console.log('a user connected');
 });
 
