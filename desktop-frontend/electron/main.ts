@@ -36,7 +36,7 @@ app.whenReady().then(()=>{
 ipcMain.handle("mainTest", async () => {
   console.log("Fetching from backend!");
 
-  const response = await fetch("http://localhost:8010/");
+  const response = await fetch("http://localhost:8011/");
   const json = await response.json();
 
   // Main to renderer

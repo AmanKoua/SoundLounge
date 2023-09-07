@@ -48,7 +48,6 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: "Message from soundLounge backend" });
 });
 
-
 server.listen(8011, () => {
     console.log('listening on 8011');
 });

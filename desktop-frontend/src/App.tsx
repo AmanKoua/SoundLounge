@@ -5,6 +5,12 @@ function App() {
   useEffect(() => {
     const socket = io("http://localhost:8010");
 
+    socket.emit("emit-test", "DOUBLE DIPPIN!");
+
+    socket.on("server-emit-test", (message) => {
+      console.log(message);
+    });
+
     window.electronAPI.triggerRenderAlert((event, value) => {
       alert(value);
     });
@@ -18,7 +24,7 @@ function App() {
     <>
       <h1
         onClick={() => {
-          // window.electronAPI.triggerMainMessage();
+          window.electronAPI.triggerMainMessage();
         }}
       >
         Test electron-react application
