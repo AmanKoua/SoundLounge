@@ -33,13 +33,13 @@ app.whenReady().then(()=>{
 })
 
 // Renderer to main
-ipcMain.handle("mainTest", async () => {
-  console.log("Fetching from backend!");
+// ipcMain.handle("mainTest", async () => {
+//   console.log("Fetching from backend!");
 
-  const response = await fetch("http://localhost:8011/");
-  const json = await response.json();
+//   const response = await fetch("http://localhost:8011/");
+//   const json = await response.json();
 
-  // Main to renderer
-  win.webContents.send('displayAlert', json.message);
+//   // Main to renderer
+//   win.webContents.send('displayAlert', json.message);
 
-});
+// });

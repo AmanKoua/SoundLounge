@@ -2,11 +2,10 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Renderer to main
-  triggerMainMessage: () => ipcRenderer.invoke('mainTest'),
+  // triggerMainMessage: () => ipcRenderer.invoke('mainTest'),
 
   // Main to renderer
-  triggerRenderAlert: (callback) => ipcRenderer.on('displayAlert', callback),
-  triggerEmitAlert: (callback) => ipcRenderer.on('displayEmitAlert', callback),
+  // triggerRenderAlert: (callback) => ipcRenderer.on('displayAlert', callback),
 })
 
 ipcRenderer.on('SET_SOURCE', (event) => {

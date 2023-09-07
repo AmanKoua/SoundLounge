@@ -16,12 +16,16 @@ const io = new Server({
 
 io.on('connection', (socket) => {
 
-    socket.on("emit-test", (msg) => {
-        io.emit("server-emit-test", "This is an emission from the server!");
-        console.log(msg);
+    // socket.on("emit-test", (msg) => {
+    //     io.emit("server-emit-test", "This is an emission from the server!");
+    //     console.log(msg);
+    // })
+
+    socket.on("client-audio-packet", (blob) => {
+        console.log("audio packet! " + blob);
     })
 
-    console.log('a user connected -----');
+    console.log('User connected to socket.io server!');
 });
 
 io.listen(8010);
