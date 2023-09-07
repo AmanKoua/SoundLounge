@@ -4,7 +4,15 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+// const io = new Server(server);
+
+const io = new Server({
+    cors: {
+        origin: "http://localhost:5173"
+    }
+});
+
+io.listen(8010);
 
 /*
 Allowed origins list does not seem to be required to esablish a socket io connection.
@@ -32,9 +40,9 @@ io.on('connection', (socket) => {
         console.log(msg);
     })
 
-    console.log('a user connected --------------');
+    console.log('a user connected -----');
 });
 
-server.listen(8010, () => {
-    console.log('listening on 8010');
+server.listen(8011, () => {
+    console.log('listening on 8011');
 });

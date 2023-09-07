@@ -1,22 +1,21 @@
 import { useState, useEffect } from "react";
-// import io from "../node_modules/socket.io-client/build/esm/index";
+import { io } from "socket.io-client";
 
 function App() {
   useEffect(() => {
-    let x = document.getElementsByClassName("tempAudioHolder")[0];
+    const socket = io("http://localhost:8010");
 
-    // const socket = io("http://localhost:8010");
-
-    const audioInterval = setInterval(() => {
-      console.log(x.srcObject);
-      if (x.srcObject !== null) {
-        window.electronAPI.sendDesktopMediaStream({
-          message: "Stream should send!",
-          data: navigator,
-        });
-        clearInterval(audioInterval);
-      }
-    }, 1000);
+    // let x = document.getElementsByClassName("tempAudioHolder")[0];
+    // const audioInterval = setInterval(() => {
+    //   console.log(x.srcObject);
+    //   if (x.srcObject !== null) {
+    //     window.electronAPI.sendDesktopMediaStream({
+    //       message: "Stream should send!",
+    //       data: navigator,
+    //     });
+    //     clearInterval(audioInterval);
+    //   }
+    // }, 1000);
 
     window.electronAPI.triggerRenderAlert((event, value) => {
       alert(value);

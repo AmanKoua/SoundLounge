@@ -1,5 +1,5 @@
 const { app, BrowserWindow, desktopCapturer, ipcMain } = require('electron')
-const io = require("socket.io-client");
+// const io = require("socket.io-client");
 import path from 'node:path'
 
 process.env.DIST = path.join(__dirname, '../dist')
