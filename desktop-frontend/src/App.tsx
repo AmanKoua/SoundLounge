@@ -66,8 +66,8 @@ function App() {
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
       // dataavailable event is ONLY triggered in certain conditions. Read docs
-      socket.emit("client-audio-packet", event.data.size);
-      console.log(event.data);
+      socket.emit("client-audio-packet", event.data);
+      console.log("sending data...");
     });
 
     setInterval(() => {
