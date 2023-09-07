@@ -3,8 +3,6 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('electronAPI', {
   // Renderer to main
   triggerMainMessage: () => ipcRenderer.invoke('mainTest'),
-  triggerEmitTest: () => ipcRenderer.invoke("mainSocketTest"),
-  sendDesktopMediaStream: (stream: any) => ipcRenderer.send("receive-desktop-stream", stream),
 
   // Main to renderer
   triggerRenderAlert: (callback) => ipcRenderer.on('displayAlert', callback),
