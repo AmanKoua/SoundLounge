@@ -76,7 +76,7 @@ function App() {
       // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
       mediaRecorder.stop();
       mediaRecorder.start();
-    }, 10000);
+    }, 3000);
 
     socket.on("server-audio-packet", (arrayBuffer) => {
       const blob = new Blob([arrayBuffer], {
