@@ -21,8 +21,8 @@ io.on('connection', (socket) => {
     io.emit("connection-event", "a new user connected!");
 
     socket.on("client-audio-packet", (blob) => {
-        // socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
-        io.emit("server-audio-packet", blob); // send to all clients, including sender!
+        socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
+        // io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
 
     socket.on("client-socket-test", (msg) => {
