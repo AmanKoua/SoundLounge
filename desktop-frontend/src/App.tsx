@@ -7,12 +7,8 @@ import { io } from "socket.io-client";
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
-  const [userGestureCount, setUserGestureCount] = useState(0);
-  const [blobCount, setBlobCount] = useState(0);
 
   const [audioStream, setAudioStream] = useState(null);
-  // const [audioBufferNode, setAudioBufferNode] = useState(undefined);
-  // const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
 
@@ -22,8 +18,6 @@ function App() {
       return;
     }
 
-    setSocket(io("http://localhost:8010"));
-
     let tempAudio = document.getElementsByClassName("tempAudioHolder")[0];
 
     const getAudioStreamInterval = setInterval(() => {
@@ -32,25 +26,30 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
+        setSocket(io("http://localhost:8010"));
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
       }
-    }, 3000);
+    }, 500);
 
-    // socket.emit("emit-test", "Dual servers enabled!");
+    /*
 
-    // socket.on("server-emit-test", (message) => {
-    //   console.log(message);
-    // });
+    socket.emit("emit-test", "Dual servers enabled!");
 
-    // window.electronAPI.triggerRenderAlert((event, value) => {
-    //   alert(value);
-    // });
+    socket.on("server-emit-test", (message) => {
+      console.log(message);
+    });
 
-    // window.electronAPI.triggerEmitAlert((event, value) => {
-    //   alert(value);
-    // });
+    window.electronAPI.triggerRenderAlert((event, value) => {
+      alert(value);
+    });
+
+    window.electronAPI.triggerEmitAlert((event, value) => {
+      alert(value);
+    });
+
+    */
   }, [isConnected, audioStream, socket, audioStreamSettings]);
 
   useEffect(() => {
@@ -60,84 +59,41 @@ function App() {
 
     console.log("Initializing mediaRecorder");
 
-    // const options = {
-    //   audioBitsPerSecond: 128000,
-    //   mimeType: "audio/webm",
-    // };
-
-    const mediaRecorder = new MediaRecorder(audioStream /*, options*/);
+    const mediaRecorder = new MediaRecorder(audioStream);
     mediaRecorder.start();
 
-    mediaRecorder.addEventListener("dataavailable", (event) => {
+    mediaRecorder.addEventListener("dataavailable", async (event) => {
       console.log("Emitting data!");
       // dataavailable event is ONLY triggered in certain conditions. Read docs
       socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
     });
 
     setInterval(() => {
-      mediaRecorder.requestData();
-    }, 3000);
+      /*
+      Stopping and restarting will trigger a dataavailable event!
+      */
+      // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
+      mediaRecorder.stop();
+      mediaRecorder.start();
+    }, 1000);
+
+    socket.on("server-audio-packet", (arrayBuffer) => {
+      const blob = new Blob([arrayBuffer], {
+        // type: "video/x-matroska;codecs=avc1,opus",
+        type: "video/webm;codecs=vp8,opus",
+      });
+
+      // This portion works for the FIRST arraybuffer sent!
+      const audioElement = new Audio(URL.createObjectURL(blob));
+      audioElement.controls = true;
+      document.body.appendChild(audioElement);
+    });
 
     setIsUploadInitialized(true);
   }, [audioStream, socket, isUploadInitialized]);
 
-  useEffect(() => {
-    if (userGestureCount === 0 || userGestureCount > 1) {
-      // execute only once after user user has gestured!
-      return;
-    }
-
-    console.log("Setting up socket listener!");
-
-    // const aCtx: AudioContext = new AudioContext();
-    // let primaryAudioNode: AudioBufferSourceNode;
-
-    socket.on(
-      "server-audio-packet",
-      (arrayBuffer) => {
-        const blob = new Blob([arrayBuffer], {
-          type: "video/x-matroska;codecs=avc1,opus",
-        });
-
-        // This portion works for the FIRST arraybuffer sent!
-        const audioElement = new Audio(URL.createObjectURL(blob));
-        audioElement.controls = true;
-        document.body.appendChild(audioElement);
-      }
-      // async (arrayBuffer) => { // cant decode arrayBuffer :(
-      //   await aCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
-      //     primaryAudioNode = aCtx.createBufferSource();
-      //     primaryAudioNode.buffer = decodedBuffer;
-      //     primaryAudioNode.connect(aCtx.destination);
-      //     primaryAudioNode.start();
-      //   });
-
-      //   // console.log("Server audio arrayBuffer received!");
-      //   // console.log(arrayBuffer);
-      // },
-      // (error) => {
-      //   console.log(error);
-      // }
-    );
-
-    // initialize audio context, audioSourceBufferNode, and get audio stream
-
-    setUserGestureCount(userGestureCount + 1);
-  }, [userGestureCount]);
-
   return (
-    <div
-      onClick={() => {
-        setUserGestureCount(userGestureCount + 1);
-
-        if (userGestureCount > 1) {
-          return;
-        }
-
-        alert("Audio context initialized!");
-      }}
-      style={{ width: "100%", height: "500px" }}
-    >
+    <div style={{ width: "100%", height: "200px" }}>
       <h1
         onClick={() => {
           // window.electronAPI.triggerMainMessage();

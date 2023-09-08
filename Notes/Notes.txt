@@ -7,6 +7,5 @@ whose buffer is the recently decoded blob. Play the blob from from 0. Do this fo
 
 -----------------------------------------------------------------------------------
 
-the problem might be related to the fact the the APP component seems to repeatedly reconnect
-to the server. This might be the source of the problem. It needs to connect once, and only once.
-THis might be due to re-rendering creating problems, or the connection dropping after a time.
+I just verified that it might not be a server issue. When playin the audio blobs as audio
+elements directly retireved from the mediaRecorder listener, the same issue persists!
