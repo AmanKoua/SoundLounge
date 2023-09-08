@@ -1,10 +1,12 @@
+'use strict';
+
+// [START appengine_websockets_app]
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const app = express();
 const http = require('http');
 
-app.set('view engine', 'pug');
-const server = http.createServer(app);
+const server = require('http').Server(app);
 const io = require("socket.io")(server);
 
 app.get('/', (req, res) => {
@@ -16,8 +18,8 @@ io.on('connection', (socket) => {
     io.emit("connection-event", "a new user connected!");
 
     socket.on("client-audio-packet", (blob) => {
-        // socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
-        io.emit("server-audio-packet", blob); // send to all clients, including sender!
+        socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
+        // io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
 
     console.log('User connected to socket.io server!');
@@ -30,5 +32,6 @@ if (module === require.main) {
         console.log('Press Ctrl+C to quit.');
     });
 }
+// [END appengine_websockets_app]
 
 module.exports = server;

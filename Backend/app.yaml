@@ -1,0 +1,13 @@
+# [START gae_flex_quickstart_yaml]
+runtime: nodejs
+env: flex
+runtime_config:
+  operating_system: ubuntu22
+# https://cloud.google.com/appengine/docs/flexible/nodejs/configuring-your-app-with-app-yaml
+manual_scaling:
+  instances: 1
+resources:
+  cpu: 1
+  memory_gb: 0.5
+  disk_size_gb: 10
+# [END gae_flex_quickstart_yaml]

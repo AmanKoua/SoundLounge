@@ -1,20 +1,26 @@
 {
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "backend for SoundLounge",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+  "name": "SoundLounge",
+  "description": "SoundLounge app engine test",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache Version 2.0",
+  "author": "Akoua",
+  "engines": {
+    "node": ">=18.x.x"
   },
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "deploy": "gcloud app deploy",
+    "start": "node app.js"
+  },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "socket.io": "^4.7.2"
+    "express": "^4.15.4",
+    "pug": "^3.0.0",
+    "socket.io": "4.7.2",
+    "supertest": "^6.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "c8": "^8.0.0",
+    "mocha": "^10.0.0",
+    "puppeteer": "^21.0.0"
   }
 }
