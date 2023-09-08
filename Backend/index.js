@@ -16,14 +16,11 @@ const io = new Server({
 
 io.on('connection', (socket) => {
 
-    // socket.on("emit-test", (msg) => {
-    //     io.emit("server-emit-test", "This is an emission from the server!");
-    //     console.log(msg);
-    // })
+    io.emit("connection-event", "a new user connected!");
 
     socket.on("client-audio-packet", (blob) => {
-        console.log("Blob received!");
-        io.emit("server-audio-packet", blob);
+        // socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
+        io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
 
     console.log('User connected to socket.io server!');
@@ -47,12 +44,14 @@ const corsOptions = {
     origin: allowedOrigins,
 }
 
-app.use(cors(corsOptions));
+// Dont need a REST API as of right now....
 
-app.get('/', (req, res) => {
-    res.status(200).json({ message: "Message from soundLounge backend" });
-});
+// app.use(cors(corsOptions));
 
-server.listen(8011, () => {
-    console.log('listening on 8011');
-});
+// app.get('/', (req, res) => {
+//     res.status(200).json({ message: "Message from soundLounge backend" });
+// });
+
+// server.listen(8011, () => {
+//     console.log('listening on 8011');
+// });

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import { Blob } from "buffer";
 import { io } from "socket.io-client";
 
 // TODO : continue looking at https://stackoverflow.com/questions/68931068/how-to-send-mediastream-audio-data-with-socket-io
@@ -34,13 +33,6 @@ function App() {
     }, 500);
 
     /*
-
-    socket.emit("emit-test", "Dual servers enabled!");
-
-    socket.on("server-emit-test", (message) => {
-      console.log(message);
-    });
-
     window.electronAPI.triggerRenderAlert((event, value) => {
       alert(value);
     });
@@ -48,7 +40,6 @@ function App() {
     window.electronAPI.triggerEmitAlert((event, value) => {
       alert(value);
     });
-
     */
   }, [isConnected, audioStream, socket, audioStreamSettings]);
 
