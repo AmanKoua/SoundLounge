@@ -54,7 +54,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
-    res.status(200).json({ message: "Message from soundLounge backend" });
+    const PORT = parseInt(process.env.PORT) || 8080;
+    res.status(200).json({ message: "Message from soundLounge backend " + PORT });
 });
 
 if (module === require.main) {

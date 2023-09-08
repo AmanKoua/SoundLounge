@@ -25,7 +25,8 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        setSocket(io("http://localhost:8081")); // https://soundlounge-1.uk.r.appspot.com/ for deployment!
+        // setSocket(io("http://localhost:8081")); // https://soundlounge-1.uk.r.appspot.com/ for deployment!
+        setSocket(io("https://soundlounge-1.uk.r.appspot.com/"));
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
