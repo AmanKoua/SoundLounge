@@ -23,7 +23,6 @@ io.on('connection', (socket) => {
 
     socket.on("client-audio-packet", (blob) => {
         console.log("Blob received!");
-        console.log(blob);
         io.emit("server-audio-packet", blob);
     })
 

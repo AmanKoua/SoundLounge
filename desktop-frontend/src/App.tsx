@@ -8,6 +8,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [userGestureCount, setUserGestureCount] = useState(0);
+  const [blobCount, setBlobCount] = useState(0);
 
   const [audioStream, setAudioStream] = useState(null);
   // const [audioBufferNode, setAudioBufferNode] = useState(undefined);
@@ -35,7 +36,7 @@ function App() {
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
       }
-    }, 500);
+    }, 3000);
 
     // socket.emit("emit-test", "Dual servers enabled!");
 
@@ -68,13 +69,14 @@ function App() {
     mediaRecorder.start();
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
+      console.log("Emitting data!");
       // dataavailable event is ONLY triggered in certain conditions. Read docs
       socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
     });
 
     setInterval(() => {
       mediaRecorder.requestData();
-    }, 5000);
+    }, 3000);
 
     setIsUploadInitialized(true);
   }, [audioStream, socket, isUploadInitialized]);
@@ -85,6 +87,8 @@ function App() {
       return;
     }
 
+    console.log("Setting up socket listener!");
+
     // const aCtx: AudioContext = new AudioContext();
     // let primaryAudioNode: AudioBufferSourceNode;
 
@@ -94,12 +98,13 @@ function App() {
         const blob = new Blob([arrayBuffer], {
           type: "video/x-matroska;codecs=avc1,opus",
         });
-        const audioBlobURL = URL.createObjectURL(blob);
-        const audioElement = new Audio(audioBlobURL);
+
+        // This portion works for the FIRST arraybuffer sent!
+        const audioElement = new Audio(URL.createObjectURL(blob));
         audioElement.controls = true;
         document.body.appendChild(audioElement);
       }
-      // async (arrayBuffer) => {
+      // async (arrayBuffer) => { // cant decode arrayBuffer :(
       //   await aCtx.decodeAudioData(arrayBuffer, (decodedBuffer) => {
       //     primaryAudioNode = aCtx.createBufferSource();
       //     primaryAudioNode.buffer = decodedBuffer;
