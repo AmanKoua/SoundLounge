@@ -74,7 +74,7 @@ function App() {
 
     setInterval(() => {
       mediaRecorder.requestData();
-    }, 500);
+    }, 5000);
 
     setIsUploadInitialized(true);
   }, [audioStream, socket, isUploadInitialized]);
@@ -85,16 +85,15 @@ function App() {
       return;
     }
 
-    const aCtx: AudioContext = new AudioContext();
-    let primaryAudioNode: AudioBufferSourceNode;
+    // const aCtx: AudioContext = new AudioContext();
+    // let primaryAudioNode: AudioBufferSourceNode;
 
     socket.on(
       "server-audio-packet",
-      async (arrayBuffer) => {
+      (arrayBuffer) => {
         const blob = new Blob([arrayBuffer], {
           type: "video/x-matroska;codecs=avc1,opus",
         });
-        console.log(blob);
         const audioBlobURL = URL.createObjectURL(blob);
         const audioElement = new Audio(audioBlobURL);
         audioElement.controls = true;
