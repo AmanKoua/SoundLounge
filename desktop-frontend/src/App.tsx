@@ -84,7 +84,6 @@ function App() {
         type: "video/webm;codecs=vp8,opus",
       });
 
-      // This portion works for the FIRST arraybuffer sent!
       const audioElement = new Audio(URL.createObjectURL(blob));
       audioElement.controls = true;
       document.body.appendChild(audioElement);
