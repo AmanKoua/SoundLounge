@@ -25,8 +25,8 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        // setSocket(io("http://localhost:8081")); // https://soundlounge-1.uk.r.appspot.com/ for deployment!
-        setSocket(io("https://soundlounge-1.uk.r.appspot.com/"));
+        setSocket(io("http://localhost:8081")); // https://soundlounge-1.uk.r.appspot.com/ for deployment!
+        // setSocket(io("https://soundlounge-1.uk.r.appspot.com:8081"));
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
@@ -58,9 +58,18 @@ function App() {
       console.log("Emitting data!");
       // dataavailable event is ONLY triggered in certain conditions. Read docs
       socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
+      socket.emit("client-socket-test", "Socket is functional!");
     });
 
-    setInterval(() => {
+    const sleep = (time) => {
+      return new Promise((res, rej) => {
+        setTimeout(() => {
+          res();
+        }, time);
+      });
+    };
+
+    setInterval(async () => {
       /*
       Stopping and restarting will trigger a dataavailable event!
       */
@@ -79,6 +88,10 @@ function App() {
       const audioElement = new Audio(URL.createObjectURL(blob));
       audioElement.controls = true;
       document.body.appendChild(audioElement);
+    });
+
+    socket.on("server-socket-test", (msg) => {
+      console.log(msg);
     });
 
     setIsUploadInitialized(true);

@@ -25,6 +25,10 @@ io.on('connection', (socket) => {
         io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
 
+    socket.on("client-socket-test", (msg) => {
+        io.emit("server-socket-test", msg);
+    })
+
     console.log('User connected to socket.io server!');
 });
 
