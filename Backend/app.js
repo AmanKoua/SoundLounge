@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
 
 if (module === require.main) {
     const PORT = parseInt(process.env.PORT) || 8080;
-    io.listen(PORT + 1, () => {
+    io.listen(PORT, () => {
         console.log("IO listening on " + PORT);
     });
 }
@@ -62,13 +62,13 @@ app.get('/', (req, res) => {
     res.status(200).json({ message: "Message from soundLounge backend " + PORT });
 });
 
-if (module === require.main) {
-    const PORT = parseInt(process.env.PORT) || 8080;
-    server.listen(PORT, () => {
-        console.log(`App listening on port ${PORT}`);
-        console.log('Press Ctrl+C to quit.');
-    });
-}
+// if (module === require.main) {
+//     const PORT = parseInt(process.env.PORT) || 8080;
+//     server.listen(PORT, () => {
+//         console.log(`App listening on port ${PORT}`);
+//         console.log('Press Ctrl+C to quit.');
+//     });
+// }
 // [END appengine_websockets_app]
 
 module.exports = server;
