@@ -1,0 +1,7 @@
+When a user loads the application, wait for the user to interact with the page in order 
+to initialize an audioContext. Initialize a primary audioSourceBufferNode.
+
+After context and node initialization, begin retriving audioBuffer blobs from socket io connection. 
+Every half a second, decode the audioBuffer and replace audioSourceBufferNode with a new one 
+whose buffer is the recently decoded blob. Play the blob from from 0. Do this for each blob.
+

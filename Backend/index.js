@@ -22,7 +22,9 @@ io.on('connection', (socket) => {
     // })
 
     socket.on("client-audio-packet", (blob) => {
+        console.log("Blob received!");
         console.log(blob);
+        io.emit("server-audio-packet", blob);
     })
 
     console.log('User connected to socket.io server!');
