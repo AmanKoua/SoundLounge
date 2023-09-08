@@ -25,7 +25,7 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        setSocket(io("http://localhost:8010"));
+        setSocket(io("http://localhost:8080"));
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
