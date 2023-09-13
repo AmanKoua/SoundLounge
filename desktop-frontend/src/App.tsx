@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 
-// TODO : continue looking at https://stackoverflow.com/questions/68931068/how-to-send-mediastream-audio-data-with-socket-io
+import "./styles.css";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
 
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
@@ -25,8 +26,8 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        // setSocket(io("http://localhost:8081")); // https://soundlounge-1.uk.r.appspot.com/ for deployment!
-        setSocket(io("https://soundlounge-1.uk.r.appspot.com"));
+        // setSocket(io("http://localhost:8081")); // local testing
+        setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
@@ -57,17 +58,10 @@ function App() {
     mediaRecorder.addEventListener("dataavailable", async (event) => {
       console.log("Emitting data!");
       // dataavailable event is ONLY triggered in certain conditions. Read docs
-      socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
-      // socket.emit("client-socket-test", "Socket is functional!");
+      if (isBroadcasting) {
+        socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
+      }
     });
-
-    const sleep = (time) => {
-      return new Promise((res, rej) => {
-        setTimeout(() => {
-          res();
-        }, time);
-      });
-    };
 
     setInterval(async () => {
       /*
@@ -89,10 +83,6 @@ function App() {
       document.body.appendChild(audioElement);
     });
 
-    socket.on("server-socket-test", (msg) => {
-      console.log(msg);
-    });
-
     setIsUploadInitialized(true);
   }, [audioStream, socket, isUploadInitialized]);
 
@@ -102,10 +92,29 @@ function App() {
         onClick={() => {
           // window.electronAPI.triggerMainMessage();
         }}
+        className="w-max ml-auto mr-auto text-3xl mt-8 font-light"
       >
         SoundLounge proof of concept!
       </h1>
-      <audio className="tempAudioHolder" controls></audio>
+      <div className="w-max ml-auto mr-auto mt-8">
+        <h1>Toggle app mode</h1>
+        <select
+          onChange={(e) => {
+            const option = e.target.value;
+            if (e.target.value === "Broadcast") {
+              setIsBroadcasting(true);
+            } else {
+              setIsBroadcasting(false);
+            }
+          }}
+          className="w-full ml-auto mr-auto mt-5 shadow-lg"
+        >
+          <option value="Broadcast">Broadcast</option>
+          <option value="Receive">Receive</option>
+        </select>
+      </div>
+      {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
+      <audio className="tempAudioHolder"></audio>
     </div>
   );
 }
