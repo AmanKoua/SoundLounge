@@ -1,18 +1,15 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
-const io = require("socket.io-client");
+const { app, BrowserWindow, ipcMain } = require('electron')
 import path from 'node:path'
 
 process.env.DIST = path.join(__dirname, '../dist')
 process.env.PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
 
-
-let win: BrowserWindow | null
+let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -21,7 +18,6 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)
   } else {
-    // win.loadFile('dist/index.h tml')
     win.loadFile(path.join(process.env.DIST, 'index.html'))
   }
 }
@@ -32,23 +28,18 @@ app.on('window-all-closed', () => {
 })
 
 app.whenReady().then(()=>{
-  const socket = io("http://localhost:8010");
   createWindow();
+  win.webContents.send('SET_SOURCE');
 })
 
 // Renderer to main
+// ipcMain.handle("mainTest", async () => {
+//   console.log("Fetching from backend!");
 
-ipcMain.handle("mainTest", async () => {
-  console.log("Fetching from backend!");
+//   const response = await fetch("http://localhost:8011/");
+//   const json = await response.json();
 
-  const response = await fetch("http://localhost:8010/");
-  const json = await response.json();
+//   // Main to renderer
+//   win.webContents.send('displayAlert', json.message);
 
-  // Main to renderer
-  win.webContents.send('displayAlert', json.message);
-
-});
-
-
-
-
+// });

@@ -1,0 +1,7 @@
+/*
+Css file used by tailwind to compile and generate final css styles
+*/ 
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
