@@ -50,7 +50,6 @@ function App() {
 
   useEffect(() => {
     if (/*isUploadInitialized ||*/ !audioStream || !socket || !isConnected) {
-      console.log(audioStream, socket, isConnected);
       return;
     }
 
@@ -67,7 +66,6 @@ function App() {
         tempMediaRecorder.addEventListener("dataavailable", async (event) => {
           console.log("Emitting data!");
           // dataavailable event is ONLY triggered in certain conditions. Read docs
-          console.log("Broadcasting!");
           socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
         });
       }
@@ -78,10 +76,9 @@ function App() {
         /*
           Stopping and restarting will trigger a dataavailable event!
           */
-        // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
         tempMediaRecorder.stop();
         tempMediaRecorder.start();
-      }, 500);
+      }, 750);
 
       setMediaRecorderInterval(tempMediaRecorderInterval);
     } else {
@@ -90,16 +87,9 @@ function App() {
       const tempMediaRecorder = new MediaRecorder(audioStream);
       tempMediaRecorder.start();
       /*
-      Skip initial setup to avoid automatic broadcasting on app initialization
+      Skip attaching event listener to mediaRecorder to prevent automatic
+      broadcasting on startup.
       */
-      // tempMediaRecorder.addEventListener("dataavailable", async (event) => {
-      //   console.log("Emitting data!");
-      //   // dataavailable event is ONLY triggered in certain conditions. Read docs
-      //   if (isBroadcasting) {
-      //     console.log("Broadcasting!");
-      //     socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
-      //   }
-      // });
 
       setMediaRecorder(tempMediaRecorder);
 
@@ -110,7 +100,7 @@ function App() {
         // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
         tempMediaRecorder.stop();
         tempMediaRecorder.start();
-      }, 500);
+      }, 750);
 
       setMediaRecorderInterval(tempMediaRecorderInterval);
 
@@ -120,9 +110,10 @@ function App() {
           type: "video/webm;codecs=vp8,opus",
         });
 
-        const audioElement = new Audio(URL.createObjectURL(blob));
-        audioElement.controls = true;
-        document.body.appendChild(audioElement);
+        // const audioElement = new Audio(URL.createObjectURL(blob));
+        const audioElement = document.getElementById("audioPlayer");
+        audioElement.src = URL.createObjectURL(blob);
+        audioElement.play();
       });
 
       // setIsUploadInitialized(true);
@@ -159,6 +150,7 @@ function App() {
       </div>
       {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
       <audio className="tempAudioHolder"></audio>
+      <audio id="audioPlayer" controls className="ml-auto mr-auto mt-5"></audio>
     </div>
   );
 }
