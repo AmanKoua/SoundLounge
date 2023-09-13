@@ -9,6 +9,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Do not include the tailwind generated styles.css file!
+styles.css
+
 node_modules
 dist
 dist-ssr
