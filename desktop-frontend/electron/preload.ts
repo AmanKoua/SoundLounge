@@ -32,8 +32,15 @@ ipcRenderer.on('SET_SOURCE', (event) => {
 })
 
 function handleStream (audioStream: MediaStream) {
-  let temp = document.getElementsByClassName("tempAudioHolder")[0];
-  temp.srcObject = audioStream;
+
+  const handleStreamInterval = setInterval(()=>{
+    let temp = document.getElementsByClassName("tempAudioHolder")[0];
+    if(temp){
+      temp.srcObject = audioStream;
+      clearInterval(handleStreamInterval)
+    }
+  },10);
+
 }
 
 function handleError (e) {

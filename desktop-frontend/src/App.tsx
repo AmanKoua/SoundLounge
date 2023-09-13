@@ -11,6 +11,9 @@ function App() {
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
+  const [mediaRecorder, setMediaRecorder] = useState<any>(undefined);
+  const [mediaRecorderInterval, setMediaRecorderInterval] =
+    useState<any>(undefined);
 
   useEffect(() => {
     // Initial connection to socket
@@ -46,45 +49,85 @@ function App() {
   }, [isConnected, audioStream, socket, audioStreamSettings]);
 
   useEffect(() => {
-    if (isUploadInitialized || !audioStream || !socket || !isConnected) {
+    if (/*isUploadInitialized ||*/ !audioStream || !socket || !isConnected) {
+      console.log(audioStream, socket, isConnected);
       return;
     }
 
-    console.log("Initializing mediaRecorder");
+    if (mediaRecorder !== undefined && mediaRecorderInterval !== undefined) {
+      // replace mediaRecorder
 
-    const mediaRecorder = new MediaRecorder(audioStream);
-    mediaRecorder.start();
-
-    mediaRecorder.addEventListener("dataavailable", async (event) => {
-      console.log("Emitting data!");
-      // dataavailable event is ONLY triggered in certain conditions. Read docs
-      if (isBroadcasting) {
-        socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
-      }
-    });
-
-    setInterval(async () => {
-      /*
-      Stopping and restarting will trigger a dataavailable event!
-      */
-      // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
+      clearInterval(mediaRecorderInterval);
       mediaRecorder.stop();
-      mediaRecorder.start();
-    }, 500);
 
-    socket.on("server-audio-packet", (arrayBuffer) => {
-      const blob = new Blob([arrayBuffer], {
-        // type: "video/x-matroska;codecs=avc1,opus",
-        type: "video/webm;codecs=vp8,opus",
+      const tempMediaRecorder = new MediaRecorder(audioStream);
+      tempMediaRecorder.start();
+
+      if (isBroadcasting) {
+        tempMediaRecorder.addEventListener("dataavailable", async (event) => {
+          console.log("Emitting data!");
+          // dataavailable event is ONLY triggered in certain conditions. Read docs
+          console.log("Broadcasting!");
+          socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
+        });
+      }
+
+      setMediaRecorder(tempMediaRecorder);
+
+      const tempMediaRecorderInterval = setInterval(async () => {
+        /*
+          Stopping and restarting will trigger a dataavailable event!
+          */
+        // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
+        tempMediaRecorder.stop();
+        tempMediaRecorder.start();
+      }, 500);
+
+      setMediaRecorderInterval(tempMediaRecorderInterval);
+    } else {
+      // do full setup
+
+      const tempMediaRecorder = new MediaRecorder(audioStream);
+      tempMediaRecorder.start();
+      /*
+      Skip initial setup to avoid automatic broadcasting on app initialization
+      */
+      // tempMediaRecorder.addEventListener("dataavailable", async (event) => {
+      //   console.log("Emitting data!");
+      //   // dataavailable event is ONLY triggered in certain conditions. Read docs
+      //   if (isBroadcasting) {
+      //     console.log("Broadcasting!");
+      //     socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
+      //   }
+      // });
+
+      setMediaRecorder(tempMediaRecorder);
+
+      const tempMediaRecorderInterval = setInterval(async () => {
+        /*
+          Stopping and restarting will trigger a dataavailable event!
+          */
+        // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
+        tempMediaRecorder.stop();
+        tempMediaRecorder.start();
+      }, 500);
+
+      setMediaRecorderInterval(tempMediaRecorderInterval);
+
+      socket.on("server-audio-packet", (arrayBuffer) => {
+        const blob = new Blob([arrayBuffer], {
+          // type: "video/x-matroska;codecs=avc1,opus",
+          type: "video/webm;codecs=vp8,opus",
+        });
+
+        const audioElement = new Audio(URL.createObjectURL(blob));
+        audioElement.controls = true;
+        document.body.appendChild(audioElement);
       });
 
-      const audioElement = new Audio(URL.createObjectURL(blob));
-      audioElement.controls = true;
-      document.body.appendChild(audioElement);
-    });
-
-    setIsUploadInitialized(true);
-  }, [audioStream, socket, isUploadInitialized]);
+      // setIsUploadInitialized(true);
+    }
+  }, [audioStream, socket, isUploadInitialized, isBroadcasting]);
 
   return (
     <div style={{ width: "100%", height: "200px" }}>
@@ -101,7 +144,7 @@ function App() {
         <select
           onChange={(e) => {
             const option = e.target.value;
-            if (e.target.value === "Broadcast") {
+            if (option === "Broadcast") {
               setIsBroadcasting(true);
             } else {
               setIsBroadcasting(false);
@@ -109,6 +152,7 @@ function App() {
           }}
           className="w-full ml-auto mr-auto mt-5 shadow-lg"
         >
+          <option value="Invalid">Select mode</option>
           <option value="Broadcast">Broadcast</option>
           <option value="Receive">Receive</option>
         </select>
