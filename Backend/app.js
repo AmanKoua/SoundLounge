@@ -12,7 +12,7 @@ const { Server } = require("socket.io");
 
 const io = new Server({
     cors: {
-        origin: "http://localhost:5173"
+        origin: ["http://localhost:5173", "http://localhost:5174"]
     }
 });
 
@@ -48,6 +48,8 @@ Allowed origins list does not seem to be required to esablish a socket io connec
 
 const allowedOrigins = [
     "http://localhost:5173",
+    "http://localhost:5173/",
+    "http://localhost:5174",
     "http://localhost:5173/",
 ]
 
