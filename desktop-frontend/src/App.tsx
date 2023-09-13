@@ -29,8 +29,14 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        // setSocket(io("http://localhost:8081")); // local testing
-        setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
+        setSocket(
+          io("http://localhost:8080", {
+            extraHeaders: {
+              "soundLounge-auth-test": "Aman was here 123",
+            },
+          })
+        ); // local testing
+        // setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);
@@ -66,6 +72,7 @@ function App() {
         tempMediaRecorder.addEventListener("dataavailable", async (event) => {
           console.log("Emitting data!");
           // dataavailable event is ONLY triggered in certain conditions. Read docs
+          socket.userName = "Aman test 1";
           socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
         });
       }

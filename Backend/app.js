@@ -12,7 +12,8 @@ const { Server } = require("socket.io");
 
 const io = new Server({
     cors: {
-        origin: ["http://localhost:5173", "http://localhost:5174"]
+        origin: ["http://localhost:5173", "http://localhost:5174"],
+        allowedHeaders: ["soundLounge-auth-test"],
     }
 });
 
@@ -30,6 +31,13 @@ io.on('connection', (socket) => {
     })
 
     console.log('User connected to socket.io server!');
+
+    /*
+        Get socket connection headers
+    */
+    console.log(socket.handshake.headers);
+
+
 });
 
 if (module === require.main) {
