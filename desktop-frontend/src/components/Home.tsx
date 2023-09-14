@@ -1,4 +1,7 @@
+import { useState } from "react";
+
 import RoomCard from "./RoomCard";
+import RoomModal from "./RoomModal";
 
 interface Props {
   setIsBroadcasting: (val: boolean) => void;
@@ -6,6 +9,8 @@ interface Props {
 }
 
 const Home = ({ setIsBroadcasting }: Props) => {
+  const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
+
   const generateRoomCards: JSX.Element = () => {
     return (
       <>
@@ -18,6 +23,7 @@ const Home = ({ setIsBroadcasting }: Props) => {
 
   return (
     <div className="w-full h-screen pt-5">
+      {isRoomModalDisplayed && <RoomModal></RoomModal>}
       <h1
         onClick={() => {
           // window.electronAPI.triggerMainMessage();
