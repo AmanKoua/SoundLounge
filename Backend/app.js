@@ -22,6 +22,7 @@ io.on('connection', (socket) => {
     io.emit("connection-event", "a new user connected!");
 
     socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
+        console.log("audio packed received!");
         socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
         // io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
@@ -34,8 +35,8 @@ io.on('connection', (socket) => {
 
     /*
         Get socket connection headers
+        console.log(socket.handshake.headers);
     */
-    console.log(socket.handshake.headers);
 
 
 });

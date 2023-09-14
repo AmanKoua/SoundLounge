@@ -3,6 +3,7 @@ module.exports = {
   purge: {
     content: [
       './src/*.{tsx,ts}',
+      './src/components/*.{tsx,ts}'
     ],
     enabled: false, // Disable tree shaking
   },
