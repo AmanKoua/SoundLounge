@@ -1,12 +1,10 @@
 'use strict';
 
 // [START appengine_websockets_app]
-const express = require('express');
-const cors = require('cors');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
+const jwt = require("jsonwebtoken");
 const { Server } = require("socket.io");
+
+require('dotenv').config();
 
 // Socket IO server
 
@@ -27,8 +25,32 @@ io.on('connection', (socket) => {
         // io.emit("server-audio-packet", blob); // send to all clients, including sender!
     })
 
-    socket.on("client-socket-test", (msg) => {
-        io.emit("server-socket-test", msg);
+    // JWT Proof of concept testing
+
+    socket.on("generateJWT", (data) => {
+
+        let token;
+
+        try {
+            token = jwt.sign(data, process.env.JWTSECRET);
+            io.emit("signedToken", token);
+
+        } catch (e) {
+            console.log(e);
+        }
+
+    })
+
+    socket.on("decodeJWT", (data) => {
+        let token;
+
+        try {
+            token = jwt.verify(data, process.env.JWTSECRET);
+            console.log(`The decoded token is: ${token}`);
+
+        } catch (e) {
+            console.log(e);
+        }
     })
 
     console.log('User connected to socket.io server!');
@@ -37,7 +59,6 @@ io.on('connection', (socket) => {
         Get socket connection headers
         console.log(socket.handshake.headers);
     */
-
 
 });
 
@@ -48,40 +69,6 @@ if (module === require.main) {
     });
 }
 
-
-// Express REST API
-
 /*
-Allowed origins list does not seem to be required to esablish a socket io connection.
+ Express REST API was removed. Opting do handle everything over socketIO.
 */
-
-const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:5173/",
-    "http://localhost:5174",
-    "http://localhost:5173/",
-]
-
-const corsOptions = {
-    origin: allowedOrigins,
-}
-
-app.use(cors(corsOptions));
-
-app.get('/', (req, res) => {
-    const PORT = parseInt(process.env.PORT) || 8080;
-    res.status(200).json({ message: "Message from soundLounge backend " + PORT });
-});
-
-// if (module === require.main) {
-//     const PORT = parseInt(process.env.PORT) || 8080;
-//     server.listen(PORT, () => {
-//         console.log(`App listening on port ${PORT}`);
-//         console.log('Press Ctrl+C to quit.');
-//     });
-// }
-// [END appengine_websockets_app]
-
-module.exports = server;
-
-// ----------------------------------------------------------------------

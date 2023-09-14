@@ -11,6 +11,8 @@ lerna-debug.log*
 
 # Do not include the tailwind generated styles.css file!
 styles.css
+# Do not under any circumstance push .env file!
+.env
 
 node_modules
 dist

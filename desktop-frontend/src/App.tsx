@@ -127,6 +127,13 @@ function App() {
         audioElement.play();
       });
 
+      // JWT proof of concept code
+
+      socket.emit("generateJWT", "Aman created this token!");
+      socket.on("signedToken", (token) => {
+        socket.emit("decodeJWT", token);
+      });
+
       // setIsUploadInitialized(true);
     }
   }, [audioStream, socket, isUploadInitialized, isBroadcasting]);
