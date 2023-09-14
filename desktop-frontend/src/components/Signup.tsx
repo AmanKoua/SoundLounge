@@ -18,12 +18,12 @@ const Signup = () => {
             </label>
             <input type="password" className="w-full mr-auto ml-auto p-2" />
           </div>
-          <div>
+          {/* <div>
             <label className="w-max mr-auto ml-auto p-2 font-bold">
               User Name (optional)
             </label>
             <input type="text" className="w-full mr-auto ml-auto p-2" />
-          </div>
+          </div> */}
           <div className="w-max mr-auto ml-auto p-2 mt-4">
             <button className="text-black border border-blue-300 pl-1 pr-1 rounded-sm shadow-md hover:shadow-lg ">
               Sign up

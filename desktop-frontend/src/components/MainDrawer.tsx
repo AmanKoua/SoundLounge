@@ -38,7 +38,15 @@ const MainDrawer = () => {
         >
           <div className="w-max h-full ml-auto mr-auto flex-col pt-5">
             <button
-              className="mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              className="mt-1 mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Home
+            </button>
+            <button
+              className="mt-5 mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
               onClick={() => {
                 navigate("login");
               }}
@@ -52,14 +60,6 @@ const MainDrawer = () => {
               }}
             >
               Signup
-            </button>
-            <button
-              className="mt-5 mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
-              onClick={() => {
-                navigate("/");
-              }}
-            >
-              Home
             </button>
           </div>
         </div>

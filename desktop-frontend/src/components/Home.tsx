@@ -1,10 +1,21 @@
-import React from "react";
+import RoomCard from "./RoomCard";
 
 interface Props {
   setIsBroadcasting: (val: boolean) => void;
+  // Room card data
 }
 
 const Home = ({ setIsBroadcasting }: Props) => {
+  const generateRoomCards: JSX.Element = () => {
+    return (
+      <>
+        <RoomCard></RoomCard>
+        <RoomCard></RoomCard>
+        <RoomCard></RoomCard>
+      </>
+    );
+  };
+
   return (
     <div className="w-full h-screen pt-5">
       <h1
@@ -36,6 +47,7 @@ const Home = ({ setIsBroadcasting }: Props) => {
       {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
       <audio className="tempAudioHolder"></audio>
       <audio id="audioPlayer" controls className="ml-auto mr-auto mt-5"></audio>
+      {generateRoomCards()}
     </div>
   );
 };
