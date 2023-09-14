@@ -6,12 +6,12 @@ interface Props {
 
 const Home = ({ setIsBroadcasting }: Props) => {
   return (
-    <div style={{ width: "100%", height: "200px" }}>
+    <div className="w-full h-screen pt-5">
       <h1
         onClick={() => {
           // window.electronAPI.triggerMainMessage();
         }}
-        className="w-max ml-auto mr-auto text-3xl mt-8 font-light"
+        className="w-max ml-auto mr-auto text-3xl font-light"
       >
         SoundLounge proof of concept!
       </h1>

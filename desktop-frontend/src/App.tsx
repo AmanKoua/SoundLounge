@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
 import Home from "./components/Home";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
 import MainDrawer from "./components/MainDrawer";
 
 import "./styles.css";
@@ -131,8 +133,21 @@ function App() {
 
   return (
     <>
-      <MainDrawer></MainDrawer>
-      <Home setIsBroadcasting={setIsBroadcasting}></Home>
+      <div>
+        <BrowserRouter>
+          <MainDrawer></MainDrawer>
+          <div className="pages">
+            <Routes>
+              <Route
+                path="/"
+                element={<Home setIsBroadcasting={setIsBroadcasting}></Home>}
+              ></Route>
+              <Route path="login" element={<Login></Login>}></Route>
+              <Route path="signup" element={<Signup></Signup>}></Route>
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </div>
     </>
   );
 }
