@@ -7,6 +7,17 @@ const { Server } = require("socket.io");
 
 require('dotenv').config();
 
+const User = require("./userModel");
+
+const generateResponsePayload = (type, data, status) => {
+    const payload = {
+        type: type,
+        data: data,
+        status: status,
+    }
+    return payload;
+}
+
 // Socket IO server
 
 const io = new Server({
@@ -18,7 +29,7 @@ const io = new Server({
 
 mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb cluster
 
-    console.log("Mongoose connection successful!");
+    console.log('User connected to socket.io server!');
 
     io.on('connection', (socket) => {
 
@@ -35,19 +46,30 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         // User sign up and log in
 
-        socket.on("user-signup", (payload) => {
-            console.log(payload);
+        socket.on("user-signup", async (payload) => {
 
-            // TODO : Stopped here!
+            if (!payload) {
+                socket.emit("user-signup-response", generateResponsePayload("error", "No signup payload!", 400));
+                return;
+            }
 
-            if (!payload || !payload.email || !payload.password) {
+            const email = payload.email;
+            const password = payload.password;
+            let user;
 
-                const responsePayload = {
-                    type: "message",
-                    data: "User signup received!",
-                }
+            if (!email || !password) {
+                socket.emit("user-signup-response", generateResponsePayload("error", "No email or password!", 400));
+                return;
+            }
 
-                socket.emit("user-signup-response", responsePayload);
+            try {
+                user = await User.signup(email, password);
+                const userId = user._id.valueOf();
+                const token = jwt.sign(userId, process.env.JWTSECRET);
+                // TODO : Finished here!
+            } catch (e) {
+                console.log(e);
+                return socket.emit("user-signup-response", generateResponsePayload("error", "User creating failed!", 500));
             }
 
         })
@@ -60,7 +82,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             try {
                 token = jwt.sign(data, process.env.JWTSECRET);
-                io.emit("signedToken", token);
+                socket.emit("signedToken", token);
 
             } catch (e) {
                 console.log(e);
@@ -80,7 +102,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
         })
 
-        console.log('User connected to socket.io server!');
 
         /*
             Get socket connection headers
