@@ -5,3 +5,15 @@ Css file used by tailwind to compile and generate final css styles
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.error{
+    @apply bg-prodError w-max pl-2 pr-2 mr-auto ml-auto mb-2 border-2 border-red-400
+}
+
+.message{
+    @apply bg-prodMessage w-max pl-2 pr-2 mr-auto ml-auto mb-2 border-2 border-green-400
+}
+
+.btn{
+    @apply text-black border-8 border-blue-300 pl-1 pr-1 rounded-sm shadow-md hover:shadow-lg 
+}

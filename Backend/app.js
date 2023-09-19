@@ -2,6 +2,7 @@
 
 // [START appengine_websockets_app]
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 
 require('dotenv').config();
@@ -15,52 +16,83 @@ const io = new Server({
     }
 });
 
-io.on('connection', (socket) => {
+mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb cluster
 
-    io.emit("connection-event", "a new user connected!");
+    console.log("Mongoose connection successful!");
 
-    socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
-        console.log("audio packed received!");
-        socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
-        // io.emit("server-audio-packet", blob); // send to all clients, including sender!
-    })
+    io.on('connection', (socket) => {
 
-    // JWT Proof of concept testing
+        // Proof of concept audio packet transmission
 
-    socket.on("generateJWT", (data) => {
+        io.emit("connection-event", "a new user connected!");
 
-        let token;
+        socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
+            console.log("audio packed received!");
+            socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
+            // io.emit("server-audio-packet", blob); // send to all clients, including sender!
+        })
 
-        try {
-            token = jwt.sign(data, process.env.JWTSECRET);
-            io.emit("signedToken", token);
 
-        } catch (e) {
-            console.log(e);
-        }
+        // User sign up and log in
 
-    })
+        socket.on("user-signup", (payload) => {
+            console.log(payload);
 
-    socket.on("decodeJWT", (data) => {
-        let token;
+            // TODO : Stopped here!
 
-        try {
-            token = jwt.verify(data, process.env.JWTSECRET);
-            console.log(`The decoded token is: ${token}`);
+            if (!payload || !payload.email || !payload.password) {
 
-        } catch (e) {
-            console.log(e);
-        }
-    })
+                const responsePayload = {
+                    type: "message",
+                    data: "User signup received!",
+                }
 
-    console.log('User connected to socket.io server!');
+                socket.emit("user-signup-response", responsePayload);
+            }
 
-    /*
-        Get socket connection headers
-        console.log(socket.handshake.headers);
-    */
+        })
 
+        // JWT Proof of concept testing
+
+        socket.on("generateJWT", (data) => {
+
+            let token;
+
+            try {
+                token = jwt.sign(data, process.env.JWTSECRET);
+                io.emit("signedToken", token);
+
+            } catch (e) {
+                console.log(e);
+            }
+
+        })
+
+        socket.on("decodeJWT", (data) => {
+            let token;
+
+            try {
+                token = jwt.verify(data, process.env.JWTSECRET);
+                console.log(`The decoded token is: ${token}`);
+
+            } catch (e) {
+                console.log(e);
+            }
+        })
+
+        console.log('User connected to socket.io server!');
+
+        /*
+            Get socket connection headers
+            console.log(socket.handshake.headers);
+        */
+
+    });
+
+}).catch((e) => {
+    console.log(e);
 });
+
 
 if (module === require.main) {
     const PORT = parseInt(process.env.PORT) || 8080;

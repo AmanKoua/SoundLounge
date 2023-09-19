@@ -115,6 +115,8 @@ function App() {
 
       setMediaRecorderInterval(tempMediaRecorderInterval);
 
+      // Socket - receive server audio packet
+
       socket.on("server-audio-packet", (arrayBuffer) => {
         const blob = new Blob([arrayBuffer], {
           // type: "video/x-matroska;codecs=avc1,opus",
@@ -127,7 +129,13 @@ function App() {
         audioElement.play();
       });
 
-      // JWT proof of concept code
+      // Socket - receive signup response
+
+      socket.on("user-signup-response", (payload) => {
+        console.log(payload);
+      });
+
+      // Socket - JWT proof of concept code
 
       socket.emit("generateJWT", "Aman created this token!");
       socket.on("signedToken", (token) => {
@@ -137,6 +145,15 @@ function App() {
       // setIsUploadInitialized(true);
     }
   }, [audioStream, socket, isUploadInitialized, isBroadcasting]);
+
+  const signup = async (email: string, password: string) => {
+    const payload = {
+      email: email,
+      password: password,
+    };
+
+    socket.emit("user-signup", payload);
+  };
 
   return (
     <>
@@ -150,7 +167,10 @@ function App() {
                 element={<Home setIsBroadcasting={setIsBroadcasting}></Home>}
               ></Route>
               <Route path="login" element={<Login></Login>}></Route>
-              <Route path="signup" element={<Signup></Signup>}></Route>
+              <Route
+                path="signup"
+                element={<Signup signup={signup}></Signup>}
+              ></Route>
             </Routes>
           </div>
         </BrowserRouter>
