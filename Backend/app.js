@@ -56,21 +56,38 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             const email = payload.email;
             const password = payload.password;
             let user;
+            let token;
 
             if (!email || !password) {
                 socket.emit("user-signup-response", generateResponsePayload("error", "No email or password!", 400));
                 return;
             }
 
+            if (password.length < 7 || !email.includes("@")) {
+                socket.emit("user-signup-response", generateResponsePayload("error", "Invalid email or password!", 400));
+                return;
+            }
+
+            const tempUsers = await User.find({ email: email });
+
+            if (tempUsers.length > 0) {
+                socket.emit("user-signup-response", generateResponsePayload("error", "Email is already in use!", 400));
+                return;
+            }
+
             try {
                 user = await User.signup(email, password);
                 const userId = user._id.valueOf();
-                const token = jwt.sign(userId, process.env.JWTSECRET);
+                token = jwt.sign(userId, process.env.JWTSECRET);
                 // TODO : Finished here!
             } catch (e) {
                 console.log(e);
-                return socket.emit("user-signup-response", generateResponsePayload("error", "User creating failed!", 500));
+                socket.emit("user-signup-response", generateResponsePayload("error", "User creating failed!", 500));
+                return;
             }
+
+            socket.emit("user-signup-response", generateResponsePayload("message", token, 200));
+            return;
 
         })
 

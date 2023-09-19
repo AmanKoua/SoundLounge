@@ -1,14 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface signupProps {
   signup: (email: string, password: string) => Promise<void>;
+  userSignupResponse: any;
 }
 
-const Signup = ({ signup }: signupProps) => {
+const Signup = ({ signup, userSignupResponse }: signupProps) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPass, setUserPass] = useState("");
+  const [triggerResponse, setTriggerResponse] = useState(false);
+
+  const displaySignupResponse = () => {
+    if (triggerResponse) {
+      if (userSignupResponse) {
+        if (userSignupResponse.type == "error") {
+          setError(userSignupResponse.data);
+        } else {
+          setMessage("Successfully created user account!");
+        }
+      }
+    } else {
+      return;
+    }
+  };
+
+  useEffect(() => {
+    if (triggerResponse) {
+      displaySignupResponse();
+      setTriggerResponse(false);
+    }
+  }, [triggerResponse]);
 
   return (
     <div className="bg-prodPrimary w-full sm:w-8/12 h-screen mr-auto ml-auto pt-10">
@@ -67,6 +90,11 @@ const Signup = ({ signup }: signupProps) => {
                 }
 
                 const result = await signup(userEmail, userPass);
+
+                setTimeout(() => {
+                  // Wait for a second and a half to get signup response
+                  setTriggerResponse(true);
+                }, 1500);
               }}
             >
               Sign up

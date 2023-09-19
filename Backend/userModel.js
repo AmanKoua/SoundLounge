@@ -55,7 +55,7 @@ userSchema.statics.signup = async function (email, password) {
         throw Error("Missing required fields!");
     }
 
-    if (!validator.isEmail(email)) {
+    if (!email.includes("@")) {
         throw Error("Invalid email!");
     }
 

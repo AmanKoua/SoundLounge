@@ -21,6 +21,8 @@ function App() {
   const [mediaRecorderInterval, setMediaRecorderInterval] =
     useState<any>(undefined);
 
+  const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
+
   useEffect(() => {
     // Initial connection to socket
     if (isConnected || audioStream || socket || audioStreamSettings) {
@@ -132,21 +134,26 @@ function App() {
       // Socket - receive signup response
 
       socket.on("user-signup-response", (payload) => {
-        console.log(payload);
+        setUserSignupResponse(payload);
       });
 
       // Socket - JWT proof of concept code
 
-      socket.emit("generateJWT", "Aman created this token!");
-      socket.on("signedToken", (token) => {
-        socket.emit("decodeJWT", token);
-      });
+      // socket.emit("generateJWT", "Aman created this token!");
+      // socket.on("signedToken", (token) => {
+      //   socket.emit("decodeJWT", token);
+      // });
 
       // setIsUploadInitialized(true);
     }
   }, [audioStream, socket, isUploadInitialized, isBroadcasting]);
 
   const signup = async (email: string, password: string) => {
+    if (!socket) {
+      alert("Cannot signup because socket is not initialized!");
+      return;
+    }
+
     const payload = {
       email: email,
       password: password,
@@ -169,7 +176,12 @@ function App() {
               <Route path="login" element={<Login></Login>}></Route>
               <Route
                 path="signup"
-                element={<Signup signup={signup}></Signup>}
+                element={
+                  <Signup
+                    signup={signup}
+                    userSignupResponse={userSignupResponse}
+                  ></Signup>
+                }
               ></Route>
             </Routes>
           </div>
