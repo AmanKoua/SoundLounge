@@ -86,6 +86,9 @@ const Home = ({
       {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
       <audio className="tempAudioHolder"></audio>
       <audio id="audioPlayer" controls className="ml-auto mr-auto mt-5"></audio>
+      <div className="w-10/12 h-5 ml-auto mr-auto border-b-2 border-black">
+        {" "}
+      </div>
       {generateRoomCards()}
       <div className="w-max h-max ml-auto mr-auto">
         <button
