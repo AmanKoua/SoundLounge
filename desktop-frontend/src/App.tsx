@@ -12,6 +12,14 @@ import { RoomData } from "./customTypes";
 import "./styles.css";
 
 function App() {
+  // let tempNewRoom: RoomData = {
+  //   name: "",
+  //   description: "",
+  //   audioControlConfiguration: 0,
+  //   rotationTime: 1,
+  //   isNewRoom: true,
+  // };
+
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
@@ -24,16 +32,14 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
-
-  let emptyRoom: RoomData = {
+  const [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
+  const [newRoom, setNewRoom] = useState({
     name: "",
     description: "",
     audioControlConfiguration: 0,
     rotationTime: 1,
     isNewRoom: true,
-  };
-
-  const [userRoomData, setUserRoomData] = useState<any>([emptyRoom]); // [ {RoomData}, ...., {Empty room}]. Last index will always be empty room
+  });
 
   useEffect(() => {
     // Initial connection to socket
@@ -207,7 +213,9 @@ function App() {
     socket.emit("user-login", payload);
   };
 
-  const openRoomCreationModal = async () => {};
+  const createNewRoom = async (room: RoomData) => {
+    console.log(room);
+  };
 
   return (
     <>
@@ -218,7 +226,14 @@ function App() {
             <Routes>
               <Route
                 path="/"
-                element={<Home setIsBroadcasting={setIsBroadcasting}></Home>}
+                element={
+                  <Home
+                    newRoom={newRoom}
+                    setIsBroadcasting={setIsBroadcasting}
+                    createNewRoom={createNewRoom}
+                    setNewRoom={setNewRoom}
+                  ></Home>
+                }
               ></Route>
               <Route
                 path="login"

@@ -3,15 +3,29 @@ import { useState } from "react";
 import RoomCard from "./RoomCard";
 import RoomModal from "./RoomModal";
 
+import { RoomData } from "../customTypes";
+
 interface Props {
+  newRoom: RoomData;
   setIsBroadcasting: (val: boolean) => void;
+  createNewRoom: (room: RoomData) => Promise<void>;
+  setNewRoom: (val: any) => void;
   // Room card data
 }
 
-const Home = ({ setIsBroadcasting }: Props) => {
+const Home = ({
+  newRoom,
+  setIsBroadcasting,
+  createNewRoom,
+  setNewRoom,
+}: Props) => {
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
+  const [currentRoomData, setCurrentRoomData] = useState(newRoom);
 
   const generateRoomCards: JSX.Element = () => {
+    /*
+      TODO : Generate room cards with data retrieved from backend
+    */
     return (
       <>
         <RoomCard></RoomCard>
@@ -25,8 +39,10 @@ const Home = ({ setIsBroadcasting }: Props) => {
     <div className="w-full h-screen pt-5">
       {isRoomModalDisplayed && (
         <RoomModal
-          isNewRoom={true}
+          roomData={newRoom}
           setIsRoomModalDisplayed={setIsRoomModalDisplayed}
+          createNewRoom={createNewRoom}
+          setNewRoom={setNewRoom}
         ></RoomModal>
       )}
       <h1
