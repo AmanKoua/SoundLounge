@@ -166,6 +166,7 @@ function App() {
   }, [audioStream, socket, isUploadInitialized, isBroadcasting]);
 
   const signup = async (email: string, password: string) => {
+    setUserLoginResponse(undefined);
     if (!socket) {
       alert("Cannot signup because socket is not initialized!");
       return;
@@ -180,6 +181,8 @@ function App() {
   };
 
   const login = async (email: string, password: string) => {
+    setUserLoginResponse(undefined);
+
     if (!socket) {
       alert("Cannot login because socket is not initialized!");
       return;
