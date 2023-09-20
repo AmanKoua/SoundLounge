@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Home = ({ setIsBroadcasting }: Props) => {
-  const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
+  const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(true);
 
   const generateRoomCards: JSX.Element = () => {
     return (

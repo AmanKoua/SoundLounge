@@ -30,9 +30,9 @@ const io = new Server({
 
 mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb cluster
 
-    console.log('User connected to socket.io server!');
-
     io.on('connection', (socket) => {
+
+        console.log('User connected to socket.io server!');
 
         // Proof of concept audio packet transmission
 

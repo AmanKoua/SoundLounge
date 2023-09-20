@@ -1,6 +1,10 @@
 import React from "react";
 
-const RoomModal = () => {
+interface roomModalProps {
+  isNewRoom: boolean;
+}
+
+const RoomModal = ({ isNewRoom }: roomModalProps) => {
   return (
     <div
       className="backdrop-blur-lg w-10/12 h-5/6 border-2 border-black rounded-lg z-10 fixed"
@@ -53,7 +57,8 @@ const RoomModal = () => {
 
       <div className="w-10/12 h-max mt-5 ml-auto mr-auto flex">
         <button className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block">
-          Save Room Settings
+          {isNewRoom && "Create room"}
+          {!isNewRoom && "Save settings"}
         </button>
         <button className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block">
           Cancel

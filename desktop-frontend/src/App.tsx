@@ -196,6 +196,8 @@ function App() {
     socket.emit("user-login", payload);
   };
 
+  const openRoomCreationModal = async () => {};
+
   return (
     <>
       <div>
