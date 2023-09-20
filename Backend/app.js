@@ -9,6 +9,8 @@ const { Server } = require("socket.io");
 require('dotenv').config();
 
 const User = require("./userModel");
+const Room = require("./roomModel");
+const { ObjectId } = require("mongodb");
 
 const generateResponsePayload = (type, data, status) => {
     const payload = {
@@ -138,6 +140,58 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             socket.emit("user-login-response", generateResponsePayload("message", token, 200));
+            return;
+
+        })
+
+        // User create room
+
+        socket.on("user-create-room", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-create-room-response", generateResponsePayload("error", "No create room payload!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            const room = payload.room;
+
+            if (!token || !room) {
+                socket.emit("user-create-room-response", generateResponsePayload("error", "No token or room!", 400));
+                return;
+            }
+
+            // Verify token
+
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-create-room-response", generateResponsePayload("error", "Unauthorized room creation request!", 401));
+                return;
+            }
+
+            const tempUsers = await User.find({ _id: userId });
+
+            if (tempUsers.length == 0 || tempUsers.length > 1) {
+                socket.emit("user-create-room-response", generateResponsePayload("error", "No user found for provided token!", 400));
+                return;
+            }
+
+            let newRoom;
+
+            try {
+                newRoom = await Room.initialize(new ObjectId(userId), room.name, room.description, room.audioControlConfiguration, room.rotationTime)
+            } catch (e) {
+                console.log(e);
+                socket.emit("user-create-room-response", generateResponsePayload("error", "Room creation failed!", 500));
+                return;
+            }
+
+            await User.updateOne({ _id: new ObjectId(userId) }, { $push: { roomsList: newRoom._id } });
+
+            socket.emit("user-create-room-response", generateResponsePayload("message", "room created successfully!", 200));
             return;
 
         })

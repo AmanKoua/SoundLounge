@@ -32,6 +32,8 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
+  const [userCreateRoomResponse, setUserCreateRoomResponse] =
+    useState<any>(undefined);
   const [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
   const [newRoom, setNewRoom] = useState({
     name: "",
@@ -171,6 +173,12 @@ function App() {
         setUserLoginResponse(payload);
       });
 
+      socket.on("user-create-room-response", (payload) => {
+        console.log("--------------");
+        console.log(payload);
+        setUserCreateRoomResponse(payload);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -214,7 +222,26 @@ function App() {
   };
 
   const createNewRoom = async (room: RoomData) => {
-    console.log(room);
+    setUserCreateRoomResponse(undefined);
+
+    if (!socket) {
+      alert("Cannot create room because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to crete a new room!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      room: room,
+    };
+
+    socket.emit("user-create-room", payload);
   };
 
   return (
@@ -229,6 +256,7 @@ function App() {
                 element={
                   <Home
                     newRoom={newRoom}
+                    userCreateRoomResponse={userCreateRoomResponse}
                     setIsBroadcasting={setIsBroadcasting}
                     createNewRoom={createNewRoom}
                     setNewRoom={setNewRoom}

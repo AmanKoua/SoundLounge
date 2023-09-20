@@ -7,6 +7,7 @@ import { RoomData } from "../customTypes";
 
 interface Props {
   newRoom: RoomData;
+  userCreateRoomResponse: any;
   setIsBroadcasting: (val: boolean) => void;
   createNewRoom: (room: RoomData) => Promise<void>;
   setNewRoom: (val: any) => void;
@@ -15,6 +16,7 @@ interface Props {
 
 const Home = ({
   newRoom,
+  userCreateRoomResponse,
   setIsBroadcasting,
   createNewRoom,
   setNewRoom,
@@ -39,7 +41,8 @@ const Home = ({
     <div className="w-full h-screen pt-5">
       {isRoomModalDisplayed && (
         <RoomModal
-          roomData={newRoom}
+          roomData={currentRoomData}
+          userCreateRoomResponse={userCreateRoomResponse}
           setIsRoomModalDisplayed={setIsRoomModalDisplayed}
           createNewRoom={createNewRoom}
           setNewRoom={setNewRoom}
