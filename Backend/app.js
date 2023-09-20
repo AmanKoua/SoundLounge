@@ -196,6 +196,83 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-get-rooms
+
+        socket.on("user-get-rooms", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-get-rooms-response", generateResponsePayload("error", "No get room payload!", 400));
+                return;
+            }
+
+            const token = payload.token;
+
+            if (!token) {
+                socket.emit("user-get-rooms-response", generateResponsePayload("error", "No token!", 400));
+                return;
+            }
+
+            // Verify token
+
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-get-rooms-response", generateResponsePayload("error", "Unauthorized room retrieval request!", 401));
+                return;
+            }
+
+            const tempUsers = await User.find({ _id: userId });
+
+            if (tempUsers.length == 0 || tempUsers.length > 1) {
+                socket.emit("user-get-rooms-response", generateResponsePayload("error", "No user found for provided token!", 400));
+                return;
+            }
+
+            let resPayload = {
+                /*
+                    RoomData = 
+                    {
+                        roomId: ...., 
+                        ownerEmail:...,
+                        roomName:.....,
+                        roomDescription:....,
+                        roomAudioControlMode:...,
+                        roomRotationTimer:....,
+                    }
+                */
+
+                rooms: [], // [RoomData, ...]
+            }
+
+            /*
+                TODO : Get the rooms available to the user's friends as well
+            */
+
+            const userRoomsList = tempUsers[0].roomsList;
+
+            for (let i = 0; i < userRoomsList.length; i++) {
+
+                const room = await Room.findOne({ _id: userRoomsList[i] });
+
+                let tempRoomData = {
+                    roomId: room._id,
+                    ownerEmail: tempUsers[0].email,
+                    roomName: room.name,
+                    roomDescription: room.description,
+                    roomAudioControlMode: room.audioControlMode,
+                    roomRotationTimer: room.rotationTimer,
+                }
+
+                resPayload.rooms.push(tempRoomData);
+            }
+
+            socket.emit("user-get-rooms-response", generateResponsePayload("message", resPayload, 200));
+            return;
+
+        })
+
         // JWT Proof of concept testing
 
         socket.on("generateJWT", (data) => {

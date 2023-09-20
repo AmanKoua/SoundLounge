@@ -168,15 +168,30 @@ function App() {
         if (payload && payload.status == 200) {
           // save sent JWT token to local storage to register a user session
           localStorage.setItem("user", payload.data);
+          socket.emit("user-get-rooms", { token: payload.data });
         }
 
         setUserLoginResponse(payload);
       });
 
+      // Socket - receive create room response
+
       socket.on("user-create-room-response", (payload) => {
-        console.log("--------------");
-        console.log(payload);
+        if (payload.type != "error") {
+          socket.emit("user-get-rooms", { token: payload.data });
+        }
+
         setUserCreateRoomResponse(payload);
+      });
+
+      // Socket - Receive get rooms repsonse
+
+      socket.on("user-get-rooms-response", (payload) => {
+        console.log(payload.data.rooms);
+
+        if (payload.type != "error") {
+          setUserRoomData(payload.data.rooms);
+        }
       });
 
       // Socket - JWT proof of concept code
@@ -255,6 +270,7 @@ function App() {
                 path="/"
                 element={
                   <Home
+                    userRoomData={userRoomData}
                     newRoom={newRoom}
                     userCreateRoomResponse={userCreateRoomResponse}
                     setIsBroadcasting={setIsBroadcasting}

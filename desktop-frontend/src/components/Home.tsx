@@ -6,6 +6,7 @@ import RoomModal from "./RoomModal";
 import { RoomData } from "../customTypes";
 
 interface Props {
+  userRoomData: any;
   newRoom: RoomData;
   userCreateRoomResponse: any;
   setIsBroadcasting: (val: boolean) => void;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const Home = ({
+  userRoomData,
   newRoom,
   userCreateRoomResponse,
   setIsBroadcasting,
@@ -30,8 +32,15 @@ const Home = ({
     */
     return (
       <>
-        <RoomCard></RoomCard>
+        {userRoomData.map((room, idx) => (
+          <RoomCard
+            name={room.roomName}
+            description={room.roomDescription}
+            capacity={"0/4"}
+          ></RoomCard>
+        ))}
         {/* <RoomCard></RoomCard>
+        <RoomCard></RoomCard>
         <RoomCard></RoomCard> */}
       </>
     );
