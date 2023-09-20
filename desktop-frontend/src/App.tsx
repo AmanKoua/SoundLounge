@@ -22,6 +22,7 @@ function App() {
     useState<any>(undefined);
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
+  const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
 
   useEffect(() => {
     // Initial connection to socket
@@ -142,6 +143,17 @@ function App() {
         setUserSignupResponse(payload);
       });
 
+      // Socket - receive login response
+
+      socket.on("user-login-response", (payload) => {
+        if (payload && payload.status == 200) {
+          // save sent JWT token to local storage to register a user session
+          localStorage.setItem("user", payload.data);
+        }
+
+        setUserLoginResponse(payload);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -167,6 +179,20 @@ function App() {
     socket.emit("user-signup", payload);
   };
 
+  const login = async (email: string, password: string) => {
+    if (!socket) {
+      alert("Cannot login because socket is not initialized!");
+      return;
+    }
+
+    const payload = {
+      email: email,
+      password: password,
+    };
+
+    socket.emit("user-login", payload);
+  };
+
   return (
     <>
       <div>
@@ -178,7 +204,15 @@ function App() {
                 path="/"
                 element={<Home setIsBroadcasting={setIsBroadcasting}></Home>}
               ></Route>
-              <Route path="login" element={<Login></Login>}></Route>
+              <Route
+                path="login"
+                element={
+                  <Login
+                    login={login}
+                    userLoginResponse={userLoginResponse}
+                  ></Login>
+                }
+              ></Route>
               <Route
                 path="signup"
                 element={

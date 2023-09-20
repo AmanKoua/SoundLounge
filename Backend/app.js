@@ -3,6 +3,7 @@
 // [START appengine_websockets_app]
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const { Server } = require("socket.io");
 
 require('dotenv').config();
@@ -79,7 +80,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 user = await User.signup(email, password);
                 const userId = user._id.valueOf();
                 token = jwt.sign(userId, process.env.JWTSECRET);
-                // TODO : Finished here!
             } catch (e) {
                 console.log(e);
                 socket.emit("user-signup-response", generateResponsePayload("error", "User creating failed!", 500));
@@ -87,6 +87,57 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             socket.emit("user-signup-response", generateResponsePayload("message", token, 200));
+            return;
+
+        })
+
+        // User login 
+
+        socket.on("user-login", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-login-response", generateResponsePayload("error", "No login payload!", 400));
+                return;
+            }
+
+            const email = payload.email;
+            const password = payload.password;
+            let token;
+
+            if (!email || !password) {
+                socket.emit("user-login-response", generateResponsePayload("error", "No email or password!", 400));
+                return;
+            }
+
+            if (password.length < 7 || !email.includes("@")) {
+                socket.emit("user-login-response", generateResponsePayload("error", "Invalid email or password!", 400));
+                return;
+            }
+
+            const tempUsers = await User.find({ email: email });
+
+            if (tempUsers.length == 0 || tempUsers.length > 1) {
+                socket.emit("user-login-response", generateResponsePayload("error", "No user found for provided email!", 400));
+                return;
+            }
+
+            const match = await bcrypt.compare(password, tempUsers[0].password);
+
+            if (!match) {
+                socket.emit("user-login-response", generateResponsePayload("error", "Invalid password!", 400));
+                return;
+            }
+
+            try {
+                const userId = tempUsers[0]._id.valueOf();
+                token = jwt.sign(userId, process.env.JWTSECRET);
+            } catch (e) {
+                console.log(e);
+                socket.emit("user-login-response", generateResponsePayload("error", "User login failed!", 500));
+                return;
+            }
+
+            socket.emit("user-login-response", generateResponsePayload("message", token, 200));
             return;
 
         })
