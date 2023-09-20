@@ -134,6 +134,11 @@ function App() {
       // Socket - receive signup response
 
       socket.on("user-signup-response", (payload) => {
+        if (payload && payload.status == 200) {
+          // save sent JWT token to local storage to register a user session
+          localStorage.setItem("user", payload.data);
+        }
+
         setUserSignupResponse(payload);
       });
 

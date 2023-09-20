@@ -87,6 +87,7 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
 
                 if (userPass.length < 7) {
                   setError("password must be at least 7 characters long!");
+                  return;
                 }
 
                 const result = await signup(userEmail, userPass);
