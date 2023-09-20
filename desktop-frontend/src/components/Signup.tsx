@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface signupProps {
   signup: (email: string, password: string) => Promise<void>;
@@ -12,6 +13,8 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
   const [userPass, setUserPass] = useState("");
   const [triggerResponse, setTriggerResponse] = useState(false);
 
+  const navigate = useNavigate();
+
   const displaySignupResponse = () => {
     if (triggerResponse) {
       if (userSignupResponse) {
@@ -19,6 +22,11 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
           setError(userSignupResponse.data);
         } else {
           setMessage("Successfully created user account!");
+
+          setTimeout(() => {
+            // navigate to home screen screen after a second
+            navigate("/");
+          }, 1000);
         }
       }
     } else {
