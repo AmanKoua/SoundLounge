@@ -9,28 +9,33 @@ interface Props {
 }
 
 const Home = ({ setIsBroadcasting }: Props) => {
-  const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(true);
+  const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
 
   const generateRoomCards: JSX.Element = () => {
     return (
       <>
         <RoomCard></RoomCard>
-        <RoomCard></RoomCard>
-        <RoomCard></RoomCard>
+        {/* <RoomCard></RoomCard>
+        <RoomCard></RoomCard> */}
       </>
     );
   };
 
   return (
     <div className="w-full h-screen pt-5">
-      {isRoomModalDisplayed && <RoomModal></RoomModal>}
+      {isRoomModalDisplayed && (
+        <RoomModal
+          isNewRoom={true}
+          setIsRoomModalDisplayed={setIsRoomModalDisplayed}
+        ></RoomModal>
+      )}
       <h1
         onClick={() => {
           // window.electronAPI.triggerMainMessage();
         }}
         className="w-max ml-auto mr-auto text-3xl font-light"
       >
-        SoundLounge proof of concept!
+        SoundLounge
       </h1>
       <div className="w-max ml-auto mr-auto mt-8">
         <h1>Toggle app mode</h1>
@@ -54,6 +59,16 @@ const Home = ({ setIsBroadcasting }: Props) => {
       <audio className="tempAudioHolder"></audio>
       <audio id="audioPlayer" controls className="ml-auto mr-auto mt-5"></audio>
       {generateRoomCards()}
+      <div className="w-max h-max ml-auto mr-auto">
+        <button
+          className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
+          onClick={() => {
+            setIsRoomModalDisplayed(true);
+          }}
+        >
+          Add new room
+        </button>
+      </div>
     </div>
   );
 };

@@ -7,13 +7,14 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import MainDrawer from "./components/MainDrawer";
 
+import { RoomData } from "./customTypes";
+
 import "./styles.css";
 
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
-
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
@@ -23,6 +24,16 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
+
+  let emptyRoom: RoomData = {
+    name: "",
+    description: "",
+    audioControlConfiguration: 0,
+    rotationTime: 1,
+    isNewRoom: true,
+  };
+
+  const [userRoomData, setUserRoomData] = useState<any>([emptyRoom]); // [ {RoomData}, ...., {Empty room}]. Last index will always be empty room
 
   useEffect(() => {
     // Initial connection to socket

@@ -2,9 +2,12 @@ import React from "react";
 
 interface roomModalProps {
   isNewRoom: boolean;
+  setIsRoomModalDisplayed: (val: boolean) => void;
 }
 
-const RoomModal = ({ isNewRoom }: roomModalProps) => {
+const RoomModal = ({ isNewRoom, setIsRoomModalDisplayed }: roomModalProps) => {
+  isNewRoom = true;
+
   return (
     <div
       className="backdrop-blur-lg w-10/12 h-5/6 border-2 border-black rounded-lg z-10 fixed"
@@ -60,7 +63,12 @@ const RoomModal = ({ isNewRoom }: roomModalProps) => {
           {isNewRoom && "Create room"}
           {!isNewRoom && "Save settings"}
         </button>
-        <button className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block">
+        <button
+          className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block"
+          onClick={() => {
+            setIsRoomModalDisplayed(false);
+          }}
+        >
           Cancel
         </button>
       </div>
