@@ -263,6 +263,83 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-edit-room
+
+        socket.on("user-edit-room", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "No edit room payload!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            const roomId = payload.roomId;
+            const data = payload.data;
+
+            if (!token || !roomId || !data) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "No token, roomId, or data!", 400));
+                return;
+            }
+
+            // Verify token
+
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "Unauthorized room edit request!", 401));
+                return;
+            }
+
+            const tempUsers = await User.find({ _id: userId });
+
+            if (tempUsers.length == 0 || tempUsers.length > 1) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "No user found for provided token!", 400));
+                return;
+            }
+
+            // TODO : Edit room
+
+            /*
+            Data : {
+                name,
+                description, 
+                audioControlMode,
+                rotationTImer,
+            }
+            */
+
+            // TODO : STOPPED HERE!
+
+            // const userRoomsList = tempUsers[0].roomsList;
+            // let isRoomEdited = false;
+
+            // for (let i = 0; i < userRoomsList.length; i++) {
+            //     if (userRoomsList[i].valueOf() == roomId) {
+
+            //         let tempUserRoomsList = [];
+
+            //         for (let j = 0; j < userRoomsList.length; j++) {
+            //             if (userRoomsList[j].valueOf() != roomId) {
+            //                 tempUserRoomsList.push(userRoomsList[j]);
+            //             }
+            //         }
+
+            //         await tempUsers[0].updateOne({ $set: { roomsList: tempUserRoomsList } });
+
+            //         await Room.deleteOne({ _id: roomId });
+            //         isRoomDeleted = true;
+            //         break;
+            //     }
+            // }
+
+
+            socket.emit("user-edit-room-response", generateResponsePayload("message", "room edited successfully!", 200));
+            return;
+
+        })
+
         // user-get-rooms
 
         socket.on("user-get-rooms", async (payload) => {
