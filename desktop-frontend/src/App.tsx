@@ -169,6 +169,8 @@ function App() {
           // save sent JWT token to local storage to register a user session
           localStorage.setItem("user", payload.data);
           socket.emit("user-get-rooms", { token: payload.data });
+        } else {
+          localStorage.removeItem("email");
         }
 
         setUserLoginResponse(payload);
@@ -234,6 +236,7 @@ function App() {
     };
 
     socket.emit("user-login", payload);
+    localStorage.setItem("email", email); // set user email in local storage
   };
 
   const createNewRoom = async (room: RoomData) => {

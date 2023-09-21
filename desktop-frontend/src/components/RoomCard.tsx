@@ -4,9 +4,19 @@ interface roomCardProps {
   name: string;
   description: string;
   capacity: string;
+  idx: number;
+  setCurrentRoom: (val: number) => void;
+  setIsRoomModalDisplayed: (val: boolean) => void;
 }
 
-const RoomCard = ({ name, description, capacity }: roomCardProps) => {
+const RoomCard = ({
+  name,
+  description,
+  capacity,
+  idx,
+  setCurrentRoom,
+  setIsRoomModalDisplayed,
+}: roomCardProps) => {
   return (
     <div className="w-9/12 h-32 border-2 border-black rounded-lg overflow-hidden ml-auto mr-auto mt-5">
       <div className="w-full h-3/6 flex justify-start">
@@ -24,7 +34,13 @@ const RoomCard = ({ name, description, capacity }: roomCardProps) => {
         <button className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
           Join Room
         </button>
-        <button className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+        <button
+          className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+          onClick={() => {
+            setCurrentRoom(idx);
+            setIsRoomModalDisplayed(true);
+          }}
+        >
           Edit Room
         </button>
       </div>

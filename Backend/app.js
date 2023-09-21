@@ -257,12 +257,13 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 const room = await Room.findOne({ _id: userRoomsList[i] });
 
                 let tempRoomData = {
-                    roomId: room._id,
+                    id: room._id,
                     ownerEmail: tempUsers[0].email,
-                    roomName: room.name,
-                    roomDescription: room.description,
-                    roomAudioControlMode: room.audioControlMode,
-                    roomRotationTimer: room.rotationTimer,
+                    name: room.name,
+                    description: room.description,
+                    audioControlConfiguration: room.audioControlMode,
+                    rotationTime: room.rotationTimer,
+                    isNewRoom: false,
                 }
 
                 resPayload.rooms.push(tempRoomData);

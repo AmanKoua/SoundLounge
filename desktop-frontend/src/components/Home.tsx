@@ -26,6 +26,10 @@ const Home = ({
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
   const [currentRoomData, setCurrentRoomData] = useState(newRoom);
 
+  const setCurrentRoom = (idx: number) => {
+    setCurrentRoomData(userRoomData[idx]);
+  };
+
   const generateRoomCards: JSX.Element = () => {
     /*
       TODO : Generate room cards with data retrieved from backend
@@ -34,9 +38,12 @@ const Home = ({
       <>
         {userRoomData.map((room, idx) => (
           <RoomCard
-            name={room.roomName}
-            description={room.roomDescription}
+            name={room.name}
+            description={room.description}
             capacity={"0/4"}
+            idx={idx}
+            setCurrentRoom={setCurrentRoom}
+            setIsRoomModalDisplayed={setIsRoomModalDisplayed}
           ></RoomCard>
         ))}
         {/* <RoomCard></RoomCard>
