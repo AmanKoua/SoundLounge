@@ -101,6 +101,7 @@ const Home = ({
         <button
           className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
           onClick={() => {
+            setCurrentRoomData(newRoom);
             setIsRoomModalDisplayed(true);
           }}
         >

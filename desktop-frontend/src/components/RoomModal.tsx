@@ -176,6 +176,13 @@ const RoomModal = ({
           {roomIsNewRoom && "Create room"}
           {!roomIsNewRoom && "Save settings"}
         </button>
+
+        {!roomIsNewRoom && (
+          <button className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block">
+            Delete Room
+          </button>
+        )}
+
         <button
           className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block"
           onClick={() => {
