@@ -196,6 +196,73 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-delete-room
+
+        socket.on("user-delete-room", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-delete-room-response", generateResponsePayload("error", "No delete room payload!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            const roomId = payload.roomId;
+
+            if (!token || !roomId) {
+                socket.emit("user-delete-room-response", generateResponsePayload("error", "No token or roomId!", 400));
+                return;
+            }
+
+            // Verify token
+
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-delete-room-response", generateResponsePayload("error", "Unauthorized room deletion request!", 401));
+                return;
+            }
+
+            const tempUsers = await User.find({ _id: userId });
+
+            if (tempUsers.length == 0 || tempUsers.length > 1) {
+                socket.emit("user-delete-room-response", generateResponsePayload("error", "No user found for provided token!", 400));
+                return;
+            }
+
+            const userRoomsList = tempUsers[0].roomsList;
+            let isRoomDeleted = false;
+
+            for (let i = 0; i < userRoomsList.length; i++) {
+                if (userRoomsList[i].valueOf() == roomId) {
+
+                    let tempUserRoomsList = [];
+
+                    for (let j = 0; j < userRoomsList.length; j++) {
+                        if (userRoomsList[j].valueOf() != roomId) {
+                            tempUserRoomsList.push(userRoomsList[j]);
+                        }
+                    }
+
+                    await tempUsers[0].updateOne({ $set: { roomsList: tempUserRoomsList } });
+
+                    await Room.deleteOne({ _id: roomId });
+                    isRoomDeleted = true;
+                    break;
+                }
+            }
+
+            if (!isRoomDeleted) {
+                socket.emit("user-delete-room-response", generateResponsePayload("error", "No room found for given user!", 400));
+                return;
+            }
+
+            socket.emit("user-delete-room-response", generateResponsePayload("message", "room deleted successfully!", 200));
+            return;
+
+        })
+
         // user-get-rooms
 
         socket.on("user-get-rooms", async (payload) => {
@@ -255,6 +322,10 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             for (let i = 0; i < userRoomsList.length; i++) {
 
                 const room = await Room.findOne({ _id: userRoomsList[i] });
+
+                if (room == null || room == undefined) {
+                    continue;
+                }
 
                 let tempRoomData = {
                     id: room._id,

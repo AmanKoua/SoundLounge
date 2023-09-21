@@ -9,8 +9,10 @@ interface Props {
   userRoomData: any;
   newRoom: RoomData;
   userCreateRoomResponse: any;
+  userDeleteRoomResponse: any;
   setIsBroadcasting: (val: boolean) => void;
   createNewRoom: (room: RoomData) => Promise<void>;
+  deleteRoom: (val: string) => Promise<void>;
   setNewRoom: (val: any) => void;
   // Room card data
 }
@@ -19,8 +21,10 @@ const Home = ({
   userRoomData,
   newRoom,
   userCreateRoomResponse,
+  userDeleteRoomResponse,
   setIsBroadcasting,
   createNewRoom,
+  deleteRoom,
   setNewRoom,
 }: Props) => {
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
@@ -59,8 +63,10 @@ const Home = ({
         <RoomModal
           roomData={currentRoomData}
           userCreateRoomResponse={userCreateRoomResponse}
+          userDeleteRoomResponse={userDeleteRoomResponse}
           setIsRoomModalDisplayed={setIsRoomModalDisplayed}
           createNewRoom={createNewRoom}
+          deleteRoom={deleteRoom}
           setNewRoom={setNewRoom}
         ></RoomModal>
       )}

@@ -4,16 +4,20 @@ import { RoomData } from "../customTypes";
 interface roomModalProps {
   roomData: RoomData;
   userCreateRoomResponse: any;
+  userDeleteRoomResponse: any;
   setIsRoomModalDisplayed: (val: boolean) => void;
   createNewRoom: (room: RoomData) => Promise<void>;
+  deleteRoom: (val: string) => Promise<void>;
   setNewRoom: (val: any) => void;
 }
 
 const RoomModal = ({
   roomData,
   userCreateRoomResponse,
+  userDeleteRoomResponse,
   setIsRoomModalDisplayed,
   createNewRoom,
+  deleteRoom,
   setNewRoom,
 }: roomModalProps) => {
   const [error, setError] = useState("");
@@ -42,9 +46,25 @@ const RoomModal = ({
     }
   };
 
+  const displayDeleteRoomResponse = () => {
+    if (triggerResponse) {
+      if (userDeleteRoomResponse) {
+        if (userDeleteRoomResponse.type == "error") {
+          setError(userDeleteRoomResponse.data);
+        } else {
+          setMessage("Successfully deleted room!");
+        }
+      }
+    } else {
+      return;
+    }
+  };
+
   useEffect(() => {
     if (triggerResponse) {
+      // Create and delete response are mutually exclusive
       displayCreateRoomResponse();
+      displayDeleteRoomResponse();
       setTriggerResponse(false);
     }
   }, [triggerResponse]);
@@ -178,7 +198,12 @@ const RoomModal = ({
         </button>
 
         {!roomIsNewRoom && (
-          <button className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block">
+          <button
+            className=" mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg inline-block"
+            onClick={async () => {
+              await deleteRoom(roomData.id);
+            }}
+          >
             Delete Room
           </button>
         )}
