@@ -34,6 +34,8 @@ function App() {
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
   const [userCreateRoomResponse, setUserCreateRoomResponse] =
     useState<any>(undefined);
+  const [userEditRoomResponse, setUserEditRoomResponse] =
+    useState<any>(undefined);
   const [userDeleteRoomResponse, setUserDeleteRoomResponse] =
     useState<any>(undefined);
   const [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
@@ -188,6 +190,15 @@ function App() {
         setUserCreateRoomResponse(payload);
       });
 
+      // Socket - user edit room response
+
+      socket.on("user-edit-room-response", (payload) => {
+        if (payload.type != "error") {
+          socket.emit("user-get-rooms", { token: payload.data });
+        }
+        setUserEditRoomResponse(payload);
+      });
+
       // Socket - user delete room response
 
       socket.on("user-delete-room-response", (payload) => {
@@ -255,6 +266,7 @@ function App() {
 
   const createNewRoom = async (room: RoomData) => {
     setUserCreateRoomResponse(undefined);
+    setUserEditRoomResponse(undefined);
     setUserDeleteRoomResponse(undefined);
 
     if (!socket) {
@@ -277,8 +289,35 @@ function App() {
     socket.emit("user-create-room", payload);
   };
 
+  const editRoom = async (room: RoomData, roomId: string) => {
+    setUserCreateRoomResponse(undefined);
+    setUserEditRoomResponse(undefined);
+    setUserDeleteRoomResponse(undefined);
+
+    if (!socket) {
+      alert("Cannot create room because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to crete a new room!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      roomId: roomId,
+      data: room,
+    };
+
+    socket.emit("user-edit-room", payload);
+  };
+
   const deleteRoom = async (roomId: string) => {
     setUserCreateRoomResponse(undefined);
+    setUserEditRoomResponse(undefined);
     setUserDeleteRoomResponse(undefined);
 
     if (!socket) {
@@ -315,9 +354,11 @@ function App() {
                     userRoomData={userRoomData}
                     newRoom={newRoom}
                     userCreateRoomResponse={userCreateRoomResponse}
+                    userEditRoomResponse={userEditRoomResponse}
                     userDeleteRoomResponse={userDeleteRoomResponse}
                     setIsBroadcasting={setIsBroadcasting}
                     createNewRoom={createNewRoom}
+                    editRoom={editRoom}
                     deleteRoom={deleteRoom}
                     setNewRoom={setNewRoom}
                   ></Home>

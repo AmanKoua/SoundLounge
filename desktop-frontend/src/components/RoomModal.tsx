@@ -4,9 +4,11 @@ import { RoomData } from "../customTypes";
 interface roomModalProps {
   roomData: RoomData;
   userCreateRoomResponse: any;
+  userEditRoomResponse: any;
   userDeleteRoomResponse: any;
   setIsRoomModalDisplayed: (val: boolean) => void;
   createNewRoom: (room: RoomData) => Promise<void>;
+  editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
   setNewRoom: (val: any) => void;
 }
@@ -14,9 +16,11 @@ interface roomModalProps {
 const RoomModal = ({
   roomData,
   userCreateRoomResponse,
+  userEditRoomResponse,
   userDeleteRoomResponse,
   setIsRoomModalDisplayed,
   createNewRoom,
+  editRoom,
   deleteRoom,
   setNewRoom,
 }: roomModalProps) => {
@@ -46,6 +50,20 @@ const RoomModal = ({
     }
   };
 
+  const displayEditRoomResponse = () => {
+    if (triggerResponse) {
+      if (userEditRoomResponse) {
+        if (userEditRoomResponse.type == "error") {
+          setError(userEditRoomResponse.data);
+        } else {
+          setMessage("Successfully edited room!");
+        }
+      }
+    } else {
+      return;
+    }
+  };
+
   const displayDeleteRoomResponse = () => {
     if (triggerResponse) {
       if (userDeleteRoomResponse) {
@@ -64,6 +82,7 @@ const RoomModal = ({
     if (triggerResponse) {
       // Create and delete response are mutually exclusive
       displayCreateRoomResponse();
+      displayEditRoomResponse();
       displayDeleteRoomResponse();
       setTriggerResponse(false);
     }
@@ -185,10 +204,15 @@ const RoomModal = ({
             };
 
             // TODO : Use different method depending on if new room or an existing room
-            await createNewRoom(tempRoom);
+
+            if (roomIsNewRoom) {
+              await createNewRoom(tempRoom);
+            } else {
+              await editRoom(tempRoom, roomData.id);
+            }
 
             setTimeout(() => {
-              // Wait for a second and a half to get signup response
+              // Wait for a second and a half to get request response
               setTriggerResponse(true);
             }, 1500);
           }}

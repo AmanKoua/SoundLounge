@@ -267,6 +267,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         socket.on("user-edit-room", async (payload) => {
 
+            console.log("-----1-------");
+
             if (!payload) {
                 socket.emit("user-edit-room-response", generateResponsePayload("error", "No edit room payload!", 400));
                 return;
@@ -276,10 +278,15 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             const roomId = payload.roomId;
             const data = payload.data;
 
+            console.log("-----2-------");
+
+
             if (!token || !roomId || !data) {
                 socket.emit("user-edit-room-response", generateResponsePayload("error", "No token, roomId, or data!", 400));
                 return;
             }
+
+            console.log("-----3-------");
 
             // Verify token
 
@@ -292,6 +299,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
+            console.log("-----4-------");
+
             const tempUsers = await User.find({ _id: userId });
 
             if (tempUsers.length == 0 || tempUsers.length > 1) {
@@ -299,41 +308,39 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
-            // TODO : Edit room
+            console.log("-----5-------");
+            console.log(roomId, typeof roomId);
 
-            /*
-            Data : {
-                name,
-                description, 
-                audioControlMode,
-                rotationTImer,
+            if (roomId.length != 24) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "Invalid room ID!", 400));
+                return;
             }
-            */
 
-            // TODO : STOPPED HERE!
+            // TODO : Cannot create new objectID based on roomId? BSON bug
+            const userRoom = await Room.findOne({ _id: new ObjectId(roomId) });
 
-            // const userRoomsList = tempUsers[0].roomsList;
-            // let isRoomEdited = false;
+            if (!userRoom) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "No room found for provided id!", 400));
+                return;
+            }
 
-            // for (let i = 0; i < userRoomsList.length; i++) {
-            //     if (userRoomsList[i].valueOf() == roomId) {
+            console.log("-----6-------");
 
-            //         let tempUserRoomsList = [];
+            if (!tempUsers[0].roomsList.includes(userRoom._id)) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "Room does not belong to the provided user!", 400));
+                return;
+            }
 
-            //         for (let j = 0; j < userRoomsList.length; j++) {
-            //             if (userRoomsList[j].valueOf() != roomId) {
-            //                 tempUserRoomsList.push(userRoomsList[j]);
-            //             }
-            //         }
+            console.log("-----7-------");
 
-            //         await tempUsers[0].updateOne({ $set: { roomsList: tempUserRoomsList } });
+            try {
+                await userRoom.updateOne({ $set: { name: data.name, description: data.description, audioControlMode: data.audioControlConfiguration, rotationTimer: data.rotationTime } })
+            } catch (e) {
+                socket.emit("user-edit-room-response", generateResponsePayload("error", "Internal error when editing room!", 500));
+                console.log(e);
+            }
 
-            //         await Room.deleteOne({ _id: roomId });
-            //         isRoomDeleted = true;
-            //         break;
-            //     }
-            // }
-
+            console.log("-----8-------");
 
             socket.emit("user-edit-room-response", generateResponsePayload("message", "room edited successfully!", 200));
             return;
