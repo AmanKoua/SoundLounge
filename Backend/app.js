@@ -288,6 +288,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             console.log("-----3-------");
 
+            const roomObjectId = new ObjectId(roomId);
+
             // Verify token
 
             let userId;
@@ -317,7 +319,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             // TODO : Cannot create new objectID based on roomId? BSON bug
-            const userRoom = await Room.findOne({ _id: new ObjectId(roomId) });
+            const userRoom = await Room.findOne({ _id: roomObjectId });
 
             if (!userRoom) {
                 socket.emit("user-edit-room-response", generateResponsePayload("error", "No room found for provided id!", 400));
