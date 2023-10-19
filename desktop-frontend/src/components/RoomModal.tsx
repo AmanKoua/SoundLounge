@@ -195,7 +195,7 @@ const RoomModal = ({
               return;
             }
 
-            const tempRoom: RoomData = {
+            let tempRoom: RoomData = {
               name: roomName,
               description: roomDescription,
               audioControlConfiguration: roomAudioControlConfig,
@@ -208,6 +208,7 @@ const RoomModal = ({
             if (roomIsNewRoom) {
               await createNewRoom(tempRoom);
             } else {
+              tempRoom.isNewRoom = false;
               await editRoom(tempRoom, roomData.id);
             }
 
