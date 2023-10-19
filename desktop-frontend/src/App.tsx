@@ -184,7 +184,13 @@ function App() {
 
       socket.on("user-create-room-response", (payload) => {
         if (payload.type != "error") {
-          socket.emit("user-get-rooms", { token: payload.data });
+          const token = localStorage.getItem("user");
+
+          if (!token) {
+            alert("Cannot get user rooms because there is no access token!");
+          }
+
+          socket.emit("user-get-rooms", { token: token });
         }
 
         setUserCreateRoomResponse(payload);
@@ -194,7 +200,13 @@ function App() {
 
       socket.on("user-edit-room-response", (payload) => {
         if (payload.type != "error") {
-          socket.emit("user-get-rooms", { token: payload.data });
+          const token = localStorage.getItem("user");
+
+          if (!token) {
+            alert("Cannot get user rooms because there is no access token!");
+          }
+
+          socket.emit("user-get-rooms", { token: token });
         }
         setUserEditRoomResponse(payload);
       });
@@ -214,10 +226,12 @@ function App() {
       // Socket - Receive get rooms repsonse
 
       socket.on("user-get-rooms-response", (payload) => {
-        console.log(payload.data.rooms);
+        console.log("user get rooms response!", payload.data.rooms);
 
         if (payload.type != "error") {
           setUserRoomData(payload.data.rooms);
+        } else {
+          console.log(payload);
         }
       });
 
