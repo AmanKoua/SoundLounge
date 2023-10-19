@@ -40,6 +40,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         io.emit("connection-event", "a new user connected!");
 
+        // Testing - user gets audio packet
+
         socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
             console.log("audio packed received!");
             socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
@@ -47,7 +49,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
         })
 
 
-        // User sign up and log in
+        // User sign up
 
         socket.on("user-signup", async (payload) => {
 
@@ -408,6 +410,33 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             socket.emit("user-get-rooms-response", generateResponsePayload("message", resPayload, 200));
             return;
+
+        })
+
+        // user-join-room
+
+        socket.on("user-join-room", async (payload) => {
+
+            /*
+            TODO : Finish endpoint once uer friend mechanism has been established!
+            */
+
+            if (!payload) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "No join room payload!", 400));
+                return;
+            }
+
+            if (!payload.token || !payload.roomId) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "No token or roomId for join room request", 400));
+                return;
+            }
+
+            if (payload.token.length != 24) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "Invalid join room request!", 400));
+                return;
+            }
+
+            // need JWT, roomId, 
 
         })
 

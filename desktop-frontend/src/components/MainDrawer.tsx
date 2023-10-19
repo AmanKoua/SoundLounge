@@ -61,6 +61,14 @@ const MainDrawer = () => {
             >
               Signup
             </button>
+            <button
+              className="mt-5 mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              onClick={() => {
+                navigate("friends");
+              }}
+            >
+              Friends
+            </button>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import FriendsPage from "./components/FriendsPage";
 import MainDrawer from "./components/MainDrawer";
 
 import { RoomData } from "./customTypes";
@@ -395,6 +396,10 @@ function App() {
                     userSignupResponse={userSignupResponse}
                   ></Signup>
                 }
+              ></Route>
+              <Route
+                path="friends"
+                element={<FriendsPage></FriendsPage>}
               ></Route>
             </Routes>
           </div>
