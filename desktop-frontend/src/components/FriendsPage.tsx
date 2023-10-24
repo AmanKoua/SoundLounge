@@ -21,6 +21,28 @@ const FriendsPage = ({
     }
   }, [sendFriendRequestResponse]);
 
+  useEffect(() => {
+    let errorTimeout = undefined;
+    let messageTimeout = undefined;
+
+    if (error) {
+      errorTimeout = setTimeout(() => {
+        setError("");
+      }, 3000);
+    }
+
+    if (message) {
+      messageTimeout = setTimeout(() => {
+        setMessage("");
+      }, 3000);
+    }
+
+    return () => {
+      clearTimeout(errorTimeout);
+      clearTimeout(messageTimeout);
+    };
+  }, [error, message]);
+
   return (
     <div className="bg-prodPrimary w-full sm:w-8/12 h-max mr-auto ml-auto pt-10">
       <div className="p-1 w-max ml-auto mr-auto">
