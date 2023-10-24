@@ -236,6 +236,12 @@ function App() {
         }
       });
 
+      // Socket - Receive send friend request response
+
+      socket.on("user-send-friend-request-response", (payload) => {
+        console.log(payload);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -355,6 +361,27 @@ function App() {
     socket.emit("user-delete-room", payload);
   };
 
+  const sendFriendRequest = (email: string) => {
+    if (!socket) {
+      alert("Cannot send friend requesst because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to send a friend request!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      email: email,
+    };
+
+    socket.emit("user-send-friend-request", payload);
+  };
+
   return (
     <>
       <div>
@@ -399,7 +426,11 @@ function App() {
               ></Route>
               <Route
                 path="friends"
-                element={<FriendsPage></FriendsPage>}
+                element={
+                  <FriendsPage
+                    sendFriendRequest={sendFriendRequest}
+                  ></FriendsPage>
+                }
               ></Route>
             </Routes>
           </div>

@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 
-const FriendsPage = () => {
+interface Props {
+  sendFriendRequest: (val: string) => void;
+}
+
+const FriendsPage = ({ sendFriendRequest }: Props) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [friendEmail, setFriendEmail] = useState("");
 
   return (
     <div className="bg-prodPrimary w-full sm:w-8/12 h-max mr-auto ml-auto pt-10">
@@ -10,8 +15,20 @@ const FriendsPage = () => {
         <h3 className="w-max mr-auto ml-auto p-2 font-bold">Friends</h3>
       </div>
       <div className="w-3/4 ml-auto mr-auto border-b border-black pb-3 flex flex-row justify-around">
-        <input type="text" placeholder="Enter a user's email" />
-        <button className="font-bold text-black border border-blue-300 p-1 rounded-sm shadow-md hover:shadow-lg ">
+        <input
+          type="text"
+          placeholder="Enter a user's email"
+          value={friendEmail}
+          onChange={(e) => {
+            setFriendEmail(e.target.value);
+          }}
+        />
+        <button
+          className="font-bold text-black border border-blue-300 p-1 rounded-sm shadow-md hover:shadow-lg"
+          onClick={() => {
+            sendFriendRequest(friendEmail);
+          }}
+        >
           Add friend!
         </button>
       </div>

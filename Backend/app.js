@@ -12,6 +12,18 @@ const User = require("./userModel");
 const Room = require("./roomModel");
 const { ObjectId } = require("mongodb");
 
+let generateRandomString = (length) => {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let randomString = "";
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        randomString += charset.charAt(randomIndex);
+    }
+
+    return randomString;
+}
+
 const generateResponsePayload = (type, data, status) => {
     const payload = {
         type: type,
@@ -437,6 +449,98 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             // need JWT, roomId, 
+
+        })
+
+        // user-send-friend-request
+
+        socket.on("user-send-friend-request", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "No friend request payload!", 400));
+                return;
+            }
+
+            if (!payload.token || !payload.email) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "No token or email for friend request", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "Unauthorized friend request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            if (user.email == payload.email) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "Cannot send a friend request to yourself!", 400));
+                return;
+            }
+
+            let friend = await User.findOne({ email: payload.email });
+
+            if (!friend) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "No user found for provided email!", 404));
+                return;
+            }
+
+            const userFriendsList = user.friendsList;
+            let isAlreadyFriend = false;
+
+            for (let i = 0; i < userFriendsList.length; i++) {
+
+                let tempFriend = await User.findOne({ _id: userFriendsList[i] });
+
+                if (!tempFriend) {
+                    continue;
+                }
+
+                if (tempFriend.email == payload.email) {
+                    isAlreadyFriend = true;
+                    break;
+                }
+
+            }
+
+            if (isAlreadyFriend) {
+                socket.emit("user-send-friend-request-response", generateResponsePayload("error", "cannot add a user that's already a friend!", 400));
+                return;
+            }
+
+            // add action item to user and friend actionItems field
+
+            const requestId = generateRandomString(30);
+
+            const userActionItem = {
+                requestId: requestId,
+                type: "outgoingFriendRequest",
+                email: payload.email,
+                status: "pending"
+            }
+
+            const friendActionItem = {
+                requestId: requestId,
+                type: "incommingFriendRequest",
+                email: user.email,
+                status: "pending"
+            }
+
+            await user.updateOne({ _id: user._id }, { $push: { actionItems, userActionItem } });
+            await friend.updateOne({ _id: friend._id }, { $push: { actionItems, friendActionItem } });
+
+            socket.emit("user-send-friend-request-response", generateResponsePayload("message", "Successfully sent friend request!", 200));
+            return;
 
         })
 
