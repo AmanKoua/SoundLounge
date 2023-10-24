@@ -536,8 +536,10 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 status: "pending"
             }
 
-            await user.updateOne({ _id: user._id }, { $push: { actionItems, userActionItem } });
-            await friend.updateOne({ _id: friend._id }, { $push: { actionItems, friendActionItem } });
+            // await User.updateOne({ _id: new ObjectId(userId) }, { $push: { roomsList: newRoom._id } });
+
+            await user.updateOne({ $push: { actionItems: userActionItem } });
+            await friend.updateOne({ $push: { actionItems: friendActionItem } });
 
             socket.emit("user-send-friend-request-response", generateResponsePayload("message", "Successfully sent friend request!", 200));
             return;
