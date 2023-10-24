@@ -555,6 +555,51 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-get-friend-requests
+
+        socket.on("user-get-friend-requests", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-get-friend-requests-response", generateResponsePayload("error", "No get friend request payload!", 400));
+                return;
+            }
+
+            if (!payload.token) {
+                socket.emit("user-get-friend-requests-response", generateResponsePayload("error", "No token to get friend requests", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-get-friend-requests-response", generateResponsePayload("error", "Unauthorized get friend requests request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-get-friend-requests-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            const userActionItems = user.actionItems;
+            const userFriendRequests = [];
+
+            for (let i = 0; i < userActionItems.length; i++) {
+                if (userActionItems[i].type == "incommingFriendRequest" || userActionItems[i].type == "outgoingFriendRequest") {
+                    userFriendRequests.push(userActionItems[i]);
+                }
+            }
+
+            socket.emit("user-get-friend-requests-response", generateResponsePayload("message", userFriendRequests, 200));
+            return;
+
+        });
+
         // JWT Proof of concept testing
 
         socket.on("generateJWT", (data) => {

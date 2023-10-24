@@ -245,6 +245,16 @@ function App() {
         setSendFriendRequestResponse(payload);
       });
 
+      // Socket - get friends request response
+
+      socket.on("user-get-friend-requests-response", (payload) => {
+        if (payload.type == "error") {
+          console.log("Error when getting user friend requests");
+        }
+
+        setFriendRequests(payload.data);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -366,7 +376,7 @@ function App() {
 
   const sendFriendRequest = (email: string) => {
     if (!socket) {
-      alert("Cannot send friend requesst because socket is not initialized!");
+      alert("Cannot send friend request because socket is not initialized!");
       return;
     }
 
@@ -383,6 +393,26 @@ function App() {
     };
 
     socket.emit("user-send-friend-request", payload);
+  };
+
+  const getFriendRequests = () => {
+    if (!socket) {
+      alert("Cannot get friend requests because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to get friend requests!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+    };
+
+    socket.emit("user-get-friend-requests", payload);
   };
 
   return (
@@ -432,7 +462,9 @@ function App() {
                 element={
                   <FriendsPage
                     sendFriendRequest={sendFriendRequest}
+                    getFriendRequests={getFriendRequests}
                     sendFriendRequestResponse={sendFriendRequestResponse}
+                    friendRequests={friendRequests}
                   ></FriendsPage>
                 }
               ></Route>
