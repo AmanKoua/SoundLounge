@@ -14,7 +14,11 @@ const FriendsPage = ({
   const [friendEmail, setFriendEmail] = useState("");
 
   useEffect(() => {
-    console.log(sendFriendRequestResponse);
+    if (sendFriendRequestResponse.type == "error") {
+      setError(sendFriendRequestResponse.data);
+    } else {
+      setMessage(sendFriendRequestResponse.data);
+    }
   }, [sendFriendRequestResponse]);
 
   return (
