@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Props {
   sendFriendRequest: (val: string) => void;
+  sendFriendRequestResponse: string;
 }
 
-const FriendsPage = ({ sendFriendRequest }: Props) => {
+const FriendsPage = ({
+  sendFriendRequest,
+  sendFriendRequestResponse,
+}: Props) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
+
+  useEffect(() => {
+    console.log(sendFriendRequestResponse);
+  }, [sendFriendRequestResponse]);
 
   return (
     <div className="bg-prodPrimary w-full sm:w-8/12 h-max mr-auto ml-auto pt-10">

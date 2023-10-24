@@ -47,6 +47,9 @@ function App() {
     rotationTime: 1,
     isNewRoom: true,
   });
+  const [sendFriendRequestResponse, setSendFriendRequestResponse] =
+    useState("");
+  const [friendRequests, setFriendRequests] = useState("");
 
   useEffect(() => {
     // Initial connection to socket
@@ -239,7 +242,7 @@ function App() {
       // Socket - Receive send friend request response
 
       socket.on("user-send-friend-request-response", (payload) => {
-        console.log(payload);
+        setSendFriendRequestResponse(payload);
       });
 
       // Socket - JWT proof of concept code
@@ -429,6 +432,7 @@ function App() {
                 element={
                   <FriendsPage
                     sendFriendRequest={sendFriendRequest}
+                    sendFriendRequestResponse={sendFriendRequestResponse}
                   ></FriendsPage>
                 }
               ></Route>
