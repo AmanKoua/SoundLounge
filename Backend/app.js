@@ -488,6 +488,15 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
+            const userActionItems = user.actionItems;
+
+            for (let i = 0; i < userActionItems.length; i++) {
+                if (userActionItems[i].email == payload.email) {
+                    socket.emit("user-send-friend-request-response", generateResponsePayload("error", "Cannot send a friend request again!", 400));
+                    return;
+                }
+            }
+
             let friend = await User.findOne({ email: payload.email });
 
             if (!friend) {
