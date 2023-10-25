@@ -50,6 +50,9 @@ function App() {
   const [sendFriendRequestResponse, setSendFriendRequestResponse] =
     useState("");
   const [friendRequests, setFriendRequests] = useState("");
+  const [handleFriendRequestResponse, setHandleFriendRequestResponse] =
+    useState("");
+  const [getFriendsListResponse, setGetFriendsListResponse] = useState("");
 
   useEffect(() => {
     // Initial connection to socket
@@ -255,6 +258,18 @@ function App() {
         setFriendRequests(payload.data);
       });
 
+      // Socket - handle incomming friend request response
+
+      socket.on("user-handle-incomming-friend-request-response", (payload) => {
+        setHandleFriendRequestResponse(payload);
+      });
+
+      // Socket - user get friends list response
+
+      socket.on("user-get-friends-list-response", (payload) => {
+        setGetFriendsListResponse(payload);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -374,6 +389,26 @@ function App() {
     socket.emit("user-delete-room", payload);
   };
 
+  const getFriendsList = () => {
+    if (!socket) {
+      alert("Cannot get friends list because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to get friends list!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+    };
+
+    socket.emit("user-get-friends-list", payload);
+  };
+
   const sendFriendRequest = (email: string) => {
     if (!socket) {
       alert("Cannot send friend request because socket is not initialized!");
@@ -413,6 +448,31 @@ function App() {
     };
 
     socket.emit("user-get-friend-requests", payload);
+  };
+
+  const handleIncommingFriendRequest = (
+    requestId: string,
+    response: string
+  ) => {
+    if (!socket) {
+      alert("Cannot handle friend requests because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to handle friend requests!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      requestId: requestId,
+      response: response,
+    };
+
+    socket.emit("user-handle-incomming-friend-request", payload);
   };
 
   return (
@@ -461,9 +521,18 @@ function App() {
                 path="friends"
                 element={
                   <FriendsPage
+                    getFriendsList={getFriendsList}
                     sendFriendRequest={sendFriendRequest}
                     getFriendRequests={getFriendRequests}
+                    handleIncommingFriendRequest={handleIncommingFriendRequest}
+                    setGetFriendsListResponse={setGetFriendsListResponse}
+                    setSendFriendRequestResponse={setSendFriendRequestResponse}
+                    setHandleFriendRequestResponse={
+                      setHandleFriendRequestResponse
+                    }
+                    getFriendsListResponse={getFriendsListResponse}
                     sendFriendRequestResponse={sendFriendRequestResponse}
+                    handleFriendRequestResponse={handleFriendRequestResponse}
                     friendRequests={friendRequests}
                   ></FriendsPage>
                 }
