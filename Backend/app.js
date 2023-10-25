@@ -452,6 +452,61 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-get-friends-list
+
+        socket.on("user-get-friends-list", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-get-friends-list-response", generateResponsePayload("error", "No friend request payload!", 400));
+                return;
+            }
+
+            if (!payload.token) {
+                socket.emit("user-get-friends-list-response", generateResponsePayload("error", "No token for get friends list request!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-get-friends-list-response", generateResponsePayload("error", "Unauthorized friends list request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-get-friends-list-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            const userFriendsSlice = [];
+            const userFriends = user.friendsList;
+
+            for (let i = 0; i < userFriends.length; i++) {
+                const tempFriend = await User.findOne({ _id: userFriends[i] });
+
+                if (!tempFriend) {
+                    continue;
+                }
+
+                const tempFriendProfileSlice = {
+                    id: tempFriend._id,
+                    email: tempFriend.email,
+                    roomsList: tempFriend.roomsList,
+                }
+
+                userFriendsSlice.push(tempFriendProfileSlice);
+            }
+
+            socket.emit("user-get-friends-list-response", generateResponsePayload("message", userFriendsSlice, 200));
+            return;
+
+        })
+
         // user-send-friend-request
 
         socket.on("user-send-friend-request", async (payload) => {
@@ -599,6 +654,126 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             return;
 
         });
+
+        // user-handle-incomming-friend-request
+
+        socket.on("user-handle-incomming-friend-request", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No handle friend request payload!", 400));
+                return;
+            }
+
+            if (!payload.requestId || !payload.response) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No handle friend request requestId or response!!", 400));
+                return;
+            }
+
+            if (!payload.token) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No token to handle friend requests", 400));
+                return;
+            }
+
+            const validResponses = ["accept", "reject"];
+
+            if (!validResponses.includes(payload.response)) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "Invalid handle friend request response!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "Unauthorized handle friend requests request!", 403));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            let userActionItem = undefined;
+            let userActionItems = user.actionItems;
+            let newUserActionItems = [];
+            let friendActionItem = undefined;
+            let friendActionItems = undefined;
+            let newFriendActionItems = [];
+
+            for (let i = 0; i < userActionItems.length; i++) {
+                if (userActionItems[i].requestId == payload.requestId) {
+                    userActionItem = userActionItems[i];
+                    break;
+                }
+            }
+
+            if (userActionItem == undefined) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No action item found for provided request id!", 404));
+                return;
+            }
+
+            const friend = await User.findOne({ email: userActionItem.email });
+
+            if (!friend) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "no friend found for provided action item id!", 404));
+                return;
+            }
+
+            friendActionItems = friend.actionItems;
+
+            for (let i = 0; i < friendActionItems.length; i++) {
+                if (friendActionItems[i].requestId == payload.requestId) {
+                    friendActionItem = friendActionItems[i];
+                    break;
+                }
+            }
+
+            if (friendActionItem == undefined) {
+                socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("error", "No friend action item found for provided request id!", 404));
+                return;
+            }
+
+            for (let i = 0; i < userActionItems.length; i++) { // Remove handled action item from user's action items array
+                if (userActionItems[i].requestId != payload.requestId) {
+                    newUserActionItems.push(userActionItems[i]);
+                }
+            }
+
+            for (let i = 0; i < friendActionItems.length; i++) { // Update handled action item in friend's action item array
+                if (friendActionItems[i].requestId == payload.requestId) {
+                    const tempActionItem = {
+                        requestId: friendActionItems[i].requestId,
+                        type: friendActionItems[i].type,
+                        email: friendActionItems[i].email,
+                        status: payload.response
+                    }
+                    newFriendActionItems.push(tempActionItem);
+                }
+                else {
+                    newFriendActionItems.push(friendActionItems[i]);
+                }
+            }
+
+            if (payload.response == "accept") {
+                await user.updateOne({ $push: { friendsList: friend._id } });
+                await friend.updateOne({ $push: { friendsList: user._id } });
+            }
+            else {
+                // do nothing
+            }
+
+            await user.updateOne({ actionItems: newUserActionItems });
+            await friend.updateOne({ actionItems: newFriendActionItems });
+
+            socket.emit("user-handle-incomming-friend-request-response", generateResponsePayload("message", "Successfully handled friend request!", 200));
+            return;
+
+        })
 
         // JWT Proof of concept testing
 
