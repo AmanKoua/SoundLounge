@@ -54,6 +54,8 @@ function App() {
     useState("");
   const [getFriendsListResponse, setGetFriendsListResponse] = useState("");
   const [removeFriendResponse, setRemoveFriendResponse] = useState("");
+  const [removeRequestCardResponse, setRemoveRequestCardResponse] =
+    useState("");
 
   useEffect(() => {
     // Initial connection to socket
@@ -263,6 +265,12 @@ function App() {
 
       socket.on("user-handle-incomming-friend-request-response", (payload) => {
         setHandleFriendRequestResponse(payload);
+      });
+
+      // Socket - Remove handled friend request card
+
+      socket.on("user-remove-friend-request-card-response", (payload) => {
+        setRemoveRequestCardResponse(payload);
       });
 
       // Socket - user get friends list response
@@ -482,6 +490,29 @@ function App() {
     socket.emit("user-handle-incomming-friend-request", payload);
   };
 
+  const removeOutgoingRequestCard = (requestId: string) => {
+    if (!socket) {
+      alert(
+        "Cannot remove handled outgoing friend request card because socket is not initialized!"
+      );
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to remove handled friend requests!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      requestId: requestId,
+    };
+
+    socket.emit("user-remove-friend-request-card", payload);
+  };
+
   const removeFriend = (friendId: string) => {
     if (!socket) {
       alert("Cannot remove friend because socket is not initialized!");
@@ -552,6 +583,7 @@ function App() {
                     getFriendsList={getFriendsList}
                     sendFriendRequest={sendFriendRequest}
                     getFriendRequests={getFriendRequests}
+                    removeOutgoingRequestCard={removeOutgoingRequestCard}
                     removeFriend={removeFriend}
                     handleIncommingFriendRequest={handleIncommingFriendRequest}
                     setGetFriendsListResponse={setGetFriendsListResponse}
@@ -560,11 +592,13 @@ function App() {
                       setHandleFriendRequestResponse
                     }
                     setRemoveFriendResponse={setRemoveFriendResponse}
+                    setRemoveRequestCardResponse={setRemoveRequestCardResponse}
                     getFriendsListResponse={getFriendsListResponse}
                     sendFriendRequestResponse={sendFriendRequestResponse}
                     handleFriendRequestResponse={handleFriendRequestResponse}
                     friendRequests={friendRequests}
                     removeFriendResponse={removeFriendResponse}
+                    removeRequestCardResponse={removeRequestCardResponse}
                   ></FriendsPage>
                 }
               ></Route>

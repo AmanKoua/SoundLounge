@@ -775,6 +775,65 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-remove-friend-request-card
+
+        socket.on("user-remove-friend-request-card", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "No remove request card payload!", 400));
+                return;
+            }
+
+            if (!payload.token || !payload.requestId) {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "Invalid payload for remove friend request card!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "Unauthorized remove friend request card request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            let userActionItems = user.actionItems;
+            let tempIdx = undefined;
+
+            for (let i = 0; i < userActionItems.length; i++) {
+                if (userActionItems[i].requestId == payload.requestId) {
+                    tempIdx = i;
+                    break;
+                }
+            }
+
+            if (tempIdx == undefined) {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "No request found for provided id!", 404));
+                return;
+            }
+
+            if (userActionItems[tempIdx].status == "pending") {
+                socket.emit("user-remove-friend-request-card-response", generateResponsePayload("error", "Cannot remove a friend request card that is pending!", 404));
+                return;
+            }
+
+            userActionItems.splice(tempIdx, 1);
+            await user.updateOne({ actionItems: userActionItems });
+
+            socket.emit("user-remove-friend-request-card-response", generateResponsePayload("message", "Request removed successfully!", 200));
+            return;
+
+        })
+
         // user-remove-friend
 
         socket.on("user-remove-friend", async (payload) => {

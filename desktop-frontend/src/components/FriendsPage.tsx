@@ -4,34 +4,40 @@ interface Props {
   getFriendsList: () => void;
   sendFriendRequest: (val: string) => void;
   getFriendRequests: () => void;
+  removeOutgoingRequestCard: (val: string) => void;
   removeFriend: (val: string) => void;
   handleIncommingFriendRequest: (val: string, val1: string) => void;
   setGetFriendsListResponse: (val: any) => void;
   setSendFriendRequestResponse: (val: any) => void;
   setHandleFriendRequestResponse: (val: any) => void;
   setRemoveFriendResponse: (val: any) => void;
+  setRemoveRequestCardResponse: (val: any) => void;
   getFriendsListResponse: any;
   sendFriendRequestResponse: any;
   handleFriendRequestResponse: any;
   friendRequests: Object;
   removeFriendResponse: any;
+  removeRequestCardResponse: any;
 }
 
 const FriendsPage = ({
   getFriendsList,
   sendFriendRequest,
   getFriendRequests,
+  removeOutgoingRequestCard,
   removeFriend,
   handleIncommingFriendRequest,
   setGetFriendsListResponse,
   setSendFriendRequestResponse,
   setHandleFriendRequestResponse,
   setRemoveFriendResponse,
+  setRemoveRequestCardResponse,
   getFriendsListResponse,
   sendFriendRequestResponse,
   handleFriendRequestResponse,
   friendRequests,
   removeFriendResponse,
+  removeRequestCardResponse,
 }: Props) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -79,6 +85,18 @@ const FriendsPage = ({
   }, [removeFriendResponse]);
 
   useEffect(() => {
+    if (removeRequestCardResponse.type == "error") {
+      setError(removeRequestCardResponse.data);
+    } else {
+      setMessage(removeRequestCardResponse.data);
+    }
+
+    const clearMessageTimeout = setTimeout(() => {
+      setRemoveRequestCardResponse("");
+    }, 3000);
+  }, [removeRequestCardResponse]);
+
+  useEffect(() => {
     let errorTimeout = undefined;
     let messageTimeout = undefined;
 
@@ -116,7 +134,12 @@ const FriendsPage = ({
             {item.status == "accept" && (
               <>
                 <h1 className="text-green-500">Accepted!</h1>
-                <span className="material-symbols-outlined font-normal hover:font-bold">
+                <span
+                  className="material-symbols-outlined font-normal hover:font-bold"
+                  onClick={() => {
+                    removeOutgoingRequestCard(item.requestId);
+                  }}
+                >
                   close
                 </span>
               </>
@@ -124,7 +147,12 @@ const FriendsPage = ({
             {item.status == "reject" && (
               <>
                 <h1 className="text-red-500">Rejected!</h1>
-                <span className="material-symbols-outlined font-normal hover:font-bold">
+                <span
+                  className="material-symbols-outlined font-normal hover:font-bold"
+                  onClick={() => {
+                    removeOutgoingRequestCard(item.requestId);
+                  }}
+                >
                   close
                 </span>
               </>

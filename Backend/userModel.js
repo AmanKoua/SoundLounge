@@ -38,7 +38,7 @@ const userSchema = new Schema({
             requestId: randomly generated string of characters
             type : “incommingFriendRequest” or “outgoingFriendRequest”, 
             email: …. , 
-            status: “pending” or “rejected” or “accepted”
+            status: “pending” or "reject" or "accept"
         }
 
         */
