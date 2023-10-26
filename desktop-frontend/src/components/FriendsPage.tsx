@@ -114,10 +114,20 @@ const FriendsPage = ({
           >
             <h1 className=" w-max">{item.email}</h1>
             {item.status == "accept" && (
-              <h1 className="text-green-500">Accepted!</h1>
+              <>
+                <h1 className="text-green-500">Accepted!</h1>
+                <span className="material-symbols-outlined font-normal hover:font-bold">
+                  close
+                </span>
+              </>
             )}
             {item.status == "reject" && (
-              <h1 className="text-red-500">Rejected!</h1>
+              <>
+                <h1 className="text-red-500">Rejected!</h1>
+                <span className="material-symbols-outlined font-normal hover:font-bold">
+                  close
+                </span>
+              </>
             )}
             {item.status == "pending" && (
               <h1 className="text-yellow-500">pending</h1>
