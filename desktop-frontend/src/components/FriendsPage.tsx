@@ -113,7 +113,15 @@ const FriendsPage = ({
             className="w-full h-8 shadow-md mt-3 flex flex-row justify-around"
           >
             <h1 className=" w-max">{item.email}</h1>
-            <h1 className="">{item.status}</h1>
+            {item.status == "accept" && (
+              <h1 className="text-green-500">Accepted!</h1>
+            )}
+            {item.status == "reject" && (
+              <h1 className="text-red-500">Rejected!</h1>
+            )}
+            {item.status == "pending" && (
+              <h1 className="text-yellow-500">pending</h1>
+            )}
             {item.type != "outgoingFriendRequest" && (
               <>
                 <span
