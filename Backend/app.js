@@ -775,6 +775,66 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-remove-friend
+
+        socket.on("user-remove-friend", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "No remove friend payload!", 400));
+                return;
+            }
+
+            if (!payload.token || !payload.friendId) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "Invalid payload for remove friend request!", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "Unauthorized remove friend request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            const friend = await User.findOne({ _id: payload.friendId });
+
+            if (!friend) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "No friend found for provided id!", 404));
+                return;
+            }
+
+            let newUserFriendsList = user.friendsList;
+            let newFriendFriendsList = friend.friendsList;
+
+            let userFriendIndex = newUserFriendsList.indexOf(friend._id);
+            let friendUserIndex = newFriendFriendsList.indexOf(user._id);
+
+            if (userFriendIndex < 0 || friendUserIndex < 0) {
+                socket.emit("user-remove-friend-response", generateResponsePayload("error", "No friend in user or friend's friend list!", 404));
+                return;
+            }
+
+            newUserFriendsList.splice(userFriendIndex, 1);
+            newFriendFriendsList.splice(friendUserIndex, 1);
+
+            await user.updateOne({ $set: { friendsList: newUserFriendsList } });
+            await friend.updateOne({ $set: { friendsList: newFriendFriendsList } });
+
+            socket.emit("user-remove-friend-response", generateResponsePayload("message", "successfully removed friend!", 200));
+            return;
+
+        })
+
         // JWT Proof of concept testing
 
         socket.on("generateJWT", (data) => {

@@ -4,28 +4,34 @@ interface Props {
   getFriendsList: () => void;
   sendFriendRequest: (val: string) => void;
   getFriendRequests: () => void;
+  removeFriend: (val: string) => void;
   handleIncommingFriendRequest: (val: string, val1: string) => void;
   setGetFriendsListResponse: (val: any) => void;
   setSendFriendRequestResponse: (val: any) => void;
   setHandleFriendRequestResponse: (val: any) => void;
+  setRemoveFriendResponse: (val: any) => void;
   getFriendsListResponse: any;
   sendFriendRequestResponse: any;
   handleFriendRequestResponse: any;
   friendRequests: Object;
+  removeFriendResponse: any;
 }
 
 const FriendsPage = ({
   getFriendsList,
   sendFriendRequest,
   getFriendRequests,
+  removeFriend,
   handleIncommingFriendRequest,
   setGetFriendsListResponse,
   setSendFriendRequestResponse,
   setHandleFriendRequestResponse,
+  setRemoveFriendResponse,
   getFriendsListResponse,
   sendFriendRequestResponse,
   handleFriendRequestResponse,
   friendRequests,
+  removeFriendResponse,
 }: Props) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -59,6 +65,18 @@ const FriendsPage = ({
       setHandleFriendRequestResponse("");
     }, 3000);
   }, [handleFriendRequestResponse]);
+
+  useEffect(() => {
+    if (removeFriendResponse.type == "error") {
+      setError(removeFriendResponse.data);
+    } else {
+      setMessage(removeFriendResponse.data);
+    }
+
+    const clearMessageTimeout = setTimeout(() => {
+      setRemoveFriendResponse("");
+    }, 3000);
+  }, [removeFriendResponse]);
 
   useEffect(() => {
     let errorTimeout = undefined;
@@ -134,7 +152,12 @@ const FriendsPage = ({
               className="w-full h-8 shadow-md mt-3 flex flex-row justify-around"
             >
               <h1 className=" w-max">{item.email}</h1>
-              <span className="material-symbols-outlined font-normal hover:font-bold">
+              <span
+                className="material-symbols-outlined font-normal hover:font-bold"
+                onClick={() => {
+                  removeFriend(item.id);
+                }}
+              >
                 close
               </span>
             </div>

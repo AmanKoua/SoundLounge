@@ -53,6 +53,7 @@ function App() {
   const [handleFriendRequestResponse, setHandleFriendRequestResponse] =
     useState("");
   const [getFriendsListResponse, setGetFriendsListResponse] = useState("");
+  const [removeFriendResponse, setRemoveFriendResponse] = useState("");
 
   useEffect(() => {
     // Initial connection to socket
@@ -270,6 +271,12 @@ function App() {
         setGetFriendsListResponse(payload);
       });
 
+      // Socket - user remove friend response
+
+      socket.on("user-remove-friend-response", (payload) => {
+        setRemoveFriendResponse(payload);
+      });
+
       // Socket - JWT proof of concept code
 
       // socket.emit("generateJWT", "Aman created this token!");
@@ -475,6 +482,27 @@ function App() {
     socket.emit("user-handle-incomming-friend-request", payload);
   };
 
+  const removeFriend = (friendId: string) => {
+    if (!socket) {
+      alert("Cannot remove friend because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to remove friend!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      friendId: friendId,
+    };
+
+    socket.emit("user-remove-friend", payload);
+  };
+
   return (
     <>
       <div>
@@ -524,16 +552,19 @@ function App() {
                     getFriendsList={getFriendsList}
                     sendFriendRequest={sendFriendRequest}
                     getFriendRequests={getFriendRequests}
+                    removeFriend={removeFriend}
                     handleIncommingFriendRequest={handleIncommingFriendRequest}
                     setGetFriendsListResponse={setGetFriendsListResponse}
                     setSendFriendRequestResponse={setSendFriendRequestResponse}
                     setHandleFriendRequestResponse={
                       setHandleFriendRequestResponse
                     }
+                    setRemoveFriendResponse={setRemoveFriendResponse}
                     getFriendsListResponse={getFriendsListResponse}
                     sendFriendRequestResponse={sendFriendRequestResponse}
                     handleFriendRequestResponse={handleFriendRequestResponse}
                     friendRequests={friendRequests}
+                    removeFriendResponse={removeFriendResponse}
                   ></FriendsPage>
                 }
               ></Route>
