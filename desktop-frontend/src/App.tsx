@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { io } from "socket.io-client";
 
 import Home from "./components/Home";
@@ -328,6 +328,11 @@ function App() {
     localStorage.setItem("email", email); // set user email in local storage
   };
 
+  const logout = async () => {
+    setUserRoomData([]);
+    localStorage.removeItem("user");
+  };
+
   const createNewRoom = async (room: RoomData) => {
     setUserCreateRoomResponse(undefined);
     setUserEditRoomResponse(undefined);
@@ -342,6 +347,7 @@ function App() {
 
     if (!userToken) {
       alert("Must be signed in to crete a new room!");
+      navigate("login");
       return;
     }
 
@@ -538,7 +544,7 @@ function App() {
     <>
       <div>
         <BrowserRouter>
-          <MainDrawer></MainDrawer>
+          <MainDrawer logout={logout}></MainDrawer>
           <div className="pages">
             <Routes>
               <Route

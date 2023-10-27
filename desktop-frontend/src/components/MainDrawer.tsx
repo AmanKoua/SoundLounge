@@ -2,7 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CSS from "csstype";
 
-const MainDrawer = () => {
+interface Props {
+  logout: () => void;
+}
+
+const MainDrawer = ({ logout }: Props) => {
   const [isDrawerExpanded, setIsDrawerExpanded] = useState(false);
   const navigate = useNavigate();
 
@@ -68,6 +72,14 @@ const MainDrawer = () => {
               }}
             >
               Friends
+            </button>
+            <button
+              className="mt-5 mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              onClick={() => {
+                logout();
+              }}
+            >
+              Log out
             </button>
           </div>
         </div>
