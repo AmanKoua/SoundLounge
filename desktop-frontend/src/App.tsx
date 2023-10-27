@@ -411,6 +411,27 @@ function App() {
     socket.emit("user-delete-room", payload);
   };
 
+  const joinRoom = async (roomId: string) => {
+    if (!socket) {
+      alert("Cannot join room because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to join room!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+      roomId: roomId,
+    };
+
+    socket.emit("user-join-room", payload);
+  };
+
   const getFriendsList = () => {
     if (!socket) {
       alert("Cannot get friends list because socket is not initialized!");

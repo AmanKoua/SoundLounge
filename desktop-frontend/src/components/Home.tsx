@@ -48,6 +48,7 @@ const Home = ({
       <>
         {userRoomData.map((room, idx) => (
           <RoomCard
+            id={room.id}
             name={room.name}
             description={room.description}
             capacity={"0/4"}
@@ -56,9 +57,6 @@ const Home = ({
             setIsRoomModalDisplayed={setIsRoomModalDisplayed}
           ></RoomCard>
         ))}
-        {/* <RoomCard></RoomCard>
-        <RoomCard></RoomCard>
-        <RoomCard></RoomCard> */}
       </>
     );
   };

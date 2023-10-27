@@ -1,6 +1,7 @@
 import React from "react";
 
 interface roomCardProps {
+  id: string;
   name: string;
   description: string;
   capacity: string;
@@ -10,6 +11,7 @@ interface roomCardProps {
 }
 
 const RoomCard = ({
+  id,
   name,
   description,
   capacity,
@@ -31,7 +33,12 @@ const RoomCard = ({
         </div>
       </div>
       <div className="w-full h-3/6 flex justify-start">
-        <button className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+        <button
+          className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+          onClick={() => {
+            console.log(id);
+          }}
+        >
           Join Room
         </button>
         <button
