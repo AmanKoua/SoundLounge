@@ -24,6 +24,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [isInRoom, setIsInRoom] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
@@ -551,6 +552,7 @@ function App() {
                 path="/"
                 element={
                   <Home
+                    isInRoom={isInRoom}
                     userRoomData={userRoomData}
                     newRoom={newRoom}
                     userCreateRoomResponse={userCreateRoomResponse}
