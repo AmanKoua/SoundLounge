@@ -24,7 +24,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
-  const [isInRoom, setIsInRoom] = useState(false);
+  const [isInRoom, setIsInRoom] = useState(true);
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
@@ -42,6 +42,7 @@ function App() {
     useState<any>(undefined);
   const [userDeleteRoomResponse, setUserDeleteRoomResponse] =
     useState<any>(undefined);
+  const [currentRoomData, setCurrentRoomData] = useState<any>(undefined);
   const [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
   const [newRoom, setNewRoom] = useState({
     name: "",

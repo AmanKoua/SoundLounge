@@ -490,8 +490,10 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             socket.userId = user._id.toString();
-            socket.isBroadcasting = false;
+            socket.email = user.email;
+            socket.isBroadcasting = undefined;
             socket.isOwner = undefined;
+            socket.currentRoom = undefined;
 
             let tempRoom = await Room.findOne({ _id: payload.roomId });
 
@@ -577,6 +579,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             if (occupantsList.length < 4) {
                 socket.join(`${payload.roomId}`);
+                socket.currentRoom = payload.roomId;
 
                 const selfProfileSlice = {
                     email: user.email,
