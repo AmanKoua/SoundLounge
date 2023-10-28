@@ -48,11 +48,32 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         console.log('User connected to socket.io server!');
 
-        // Proof of concept audio packet transmission
+        // Leave default room
 
-        io.emit("connection-event", "a new user connected!");
+        let currentUserRooms = socket.rooms;
 
-        // Testing - user gets audio packet
+        if (currentUserRooms) {
+
+            let currentUserRoomsIterator = currentUserRooms.values();
+            let isFinished = false;
+            let temp = undefined;
+
+            while (!isFinished) {
+
+                temp = currentUserRoomsIterator.next();
+
+                if (!temp.value || temp.done == true) {
+                    isFinished = true;
+                    break;
+                }
+
+                socket.leave(temp.value);
+
+            }
+
+        }
+
+        // Testing - user gets audio packet (proof of concept)
 
         socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
             console.log("audio packed received!");
@@ -528,7 +549,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                         break;
                     }
 
-                    socket.leave(temp.value);
+                    await socket.leave(temp.value);
 
                 }
 
@@ -578,8 +599,9 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             if (occupantsList.length < 4) {
-                socket.join(`${payload.roomId}`);
+                await socket.join(`${payload.roomId}`);
                 socket.currentRoom = payload.roomId;
+                socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
 
                 const selfProfileSlice = {
                     email: user.email,
@@ -650,13 +672,71 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                         break;
                     }
 
-                    socket.leave(temp.value);
-
+                    socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+                    await socket.leave(temp.value);
                 }
 
             }
 
             socket.emit("user-leave-room-response", generateResponsePayload("message", "successfully left room!", 200));
+            return;
+
+        })
+
+        // user-get-room-state
+
+        socket.on("user-get-room-state", async (payload) => {
+
+            if (!socket.currentRoom) {
+                socket.emit("user-get-room-state-response", generateResponsePayload("error", "cannot get data because socket currentRoom property is undefined", 400));
+                return;
+            }
+
+            let occupants = io.sockets.adapter.rooms.get(`${socket.currentRoom}`); // retrieves the set of socket IDs currently in the given room
+            let occupantsList = [];
+            let responsePayload = [];
+
+            if (occupants) { // occupants is undefined if room is empty
+
+                let occupantsIterator = occupants.values(); // will only return an occupants iterator if not undefined
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+                    temp = occupantsIterator.next();
+
+                    if (temp.value == undefined || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
+                    occupantsList.push(tempSocket.userId);
+
+                    let tempUser = await User.findOne({ _id: tempSocket.userId });
+
+                    if (!tempUser) {
+                        // should be an impossible case, but continue nonetheless
+                        continue;
+                    }
+
+                    const tempUserProfileSlice = {
+                        email: tempUser.email,
+                        id: tempSocket.userId,
+                        isOwner: tempSocket.isOwner,
+                        isBroadcasting: tempSocket.isBroadcasting,
+                    }
+
+                    responsePayload.push(tempUserProfileSlice);
+
+                }
+
+                socket.emit("user-get-room-state-response", generateResponsePayload("message", { occupants: responsePayload }, 200));
+                return;
+
+            }
+
+            socket.emit("user-get-room-state-response", generateResponsePayload("message", { occupants: [] }, 200));
             return;
 
         })

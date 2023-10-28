@@ -195,6 +195,30 @@ function App() {
         setUserLoginResponse(payload);
       });
 
+      // Socket - room update event
+
+      socket.on("room-update-event", (email) => {
+        // if (email == localStorage.getItem("email")) {
+        //   // ignore update events that were generated natively
+        //   return;
+        // }
+
+        // alert(
+        //   `Room update event from ${email} at ${localStorage.getItem("email")}`
+        // );
+
+        socket.emit("user-get-room-state");
+      });
+
+      // Socket - user-get-room-state-response
+
+      socket.on("user-get-room-state-response", (payload) => {
+        // console.log("------");
+        // console.log(payload);
+
+        setCurrentRoomOccupantsData(payload.data.occupants);
+      });
+
       // Socket - user join room response
 
       socket.on("user-join-room-response", (payload) => {

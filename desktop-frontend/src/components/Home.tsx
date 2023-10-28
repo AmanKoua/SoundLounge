@@ -141,8 +141,8 @@ const Home = ({
       </div>
     );
   } else {
-    // console.log("-----------");
-    // console.log(currentRoomOccupantsData);
+    console.log("-----------");
+    console.log(currentRoomOccupantsData);
     // console.log(currentRoomData);
 
     return (
