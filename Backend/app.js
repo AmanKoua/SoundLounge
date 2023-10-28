@@ -490,12 +490,21 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             socket.userId = user._id.toString();
+            socket.isBroadcasting = false;
+            socket.isOwner = undefined;
 
             let tempRoom = await Room.findOne({ _id: payload.roomId });
 
             if (!tempRoom) {
                 socket.emit("user-join-room-response", generateResponsePayload("error", "No room found for provided id!", 404));
                 return;
+            }
+
+            if (tempRoom.owner.toString() == socket.userId) {
+                socket.isOwner = true;
+            }
+            else {
+                socket.isOwner = false;
             }
 
             // Leave all rooms a user is currently in before joining a new room
@@ -527,6 +536,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             let occupants = io.sockets.adapter.rooms.get(`${payload.roomId}`); // retrieves the set of socket IDs currently in the given room
             let occupantsList = [];
+            let responsePayload = [];
 
             if (occupants) { // occupants is undefined if room is empty
 
@@ -544,12 +554,39 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
                     let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
                     occupantsList.push(tempSocket.userId);
+
+                    let tempUser = await User.findOne({ _id: tempSocket.userId });
+
+                    if (!tempUser) {
+                        // should be an impossible case, but continue nonetheless
+                        continue;
+                    }
+
+                    const tempUserProfileSlice = {
+                        email: tempUser.email,
+                        id: tempSocket.userId,
+                        isOwner: tempSocket.isOwner,
+                        isBroadcasting: tempSocket.isBroadcasting,
+                    }
+
+                    responsePayload.push(tempUserProfileSlice);
+
                 }
 
             }
 
             if (occupantsList.length < 4) {
                 socket.join(`${payload.roomId}`);
+
+                const selfProfileSlice = {
+                    email: user.email,
+                    id: user._id.toString(),
+                    isOwner: socket.isOwner,
+                    isBroadcasting: socket.isBroadcasting,
+                }
+
+                responsePayload.push(selfProfileSlice);
+
                 occupantsList.push(socket.userId);
             }
             else {
@@ -557,9 +594,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
-            console.log(occupantsList);
-
-            socket.emit("user-join-room-response", generateResponsePayload("message", "Successfully joined room", 200));
+            socket.emit("user-join-room-response", generateResponsePayload("message", responsePayload, 200));
             return;
 
         })

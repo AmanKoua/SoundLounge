@@ -34,6 +34,8 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
+  const [userJoinRoomResponse, setUserJoinRoomResponse] =
+    useState<any>(undefined);
   const [userCreateRoomResponse, setUserCreateRoomResponse] =
     useState<any>(undefined);
   const [userEditRoomResponse, setUserEditRoomResponse] =
@@ -189,6 +191,13 @@ function App() {
         }
 
         setUserLoginResponse(payload);
+      });
+
+      // Socket - user join room response
+
+      socket.on("user-join-room-response", (payload) => {
+        console.log(payload);
+        setUserJoinRoomResponse(payload);
       });
 
       // Socket - receive create room response
