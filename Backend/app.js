@@ -60,7 +60,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             // io.emit("server-audio-packet", blob); // send to all clients, including sender!
         })
 
-
         // User sign up
 
         socket.on("user-signup", async (payload) => {
@@ -429,10 +428,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         socket.on("user-join-room", async (payload) => {
 
-            /*
-            TODO : Finish endpoint once uer friend mechanism has been established!
-            */
-
             if (!payload) {
                 socket.emit("user-join-room-response", generateResponsePayload("error", "No join room payload!", 400));
                 return;
@@ -443,12 +438,101 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
-            if (payload.token.length != 24) {
+            if (payload.roomId.length != 24) {
                 socket.emit("user-join-room-response", generateResponsePayload("error", "Invalid join room request!", 400));
                 return;
             }
 
-            // need JWT, roomId, 
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "Unauthorized join room request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            socket.userId = user._id.toString();
+
+            let tempRoom = await Room.findOne({ _id: payload.roomId });
+
+            if (!tempRoom) {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "No room found for provided id!", 404));
+                return;
+            }
+
+            // Leave all rooms a user is currently in before joining a new room
+
+            let currentUserRooms = socket.rooms;
+
+            if (currentUserRooms) {
+
+                let currentUserRoomsIterator = currentUserRooms.values();
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+
+                    temp = currentUserRoomsIterator.next();
+
+                    if (!temp.value || temp.done == true) {
+                        isFinished = true;
+                        return;
+                    }
+
+                    socket.leave(temp.value);
+
+                }
+
+            }
+
+            // Join new room if less than 4 occupants and get occupants profile data
+
+            let occupants = io.sockets.adapter.rooms.get(`${payload.roomId}`); // retrieves the set of socket IDs currently in the given room
+            let occupantsList = [];
+
+            if (occupants) { // occupants is undefined if room is empty
+
+                let occupantsIterator = occupants.values(); // will only return an occupants iterator if not undefined
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+                    temp = occupantsIterator.next();
+
+                    if (temp.value == undefined || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
+                    occupantsList.push(tempSocket.userId);
+                }
+
+            }
+
+            if (occupantsList.length < 4) {
+                socket.join(`${payload.roomId}`);
+            }
+            else {
+                socket.emit("user-join-room-response", generateResponsePayload("error", "Cannot join full room!", 500));
+                return;
+            }
+
+            console.log(occupantsList);
+
+            // TODO : Retieve data regarding the users in the room and send it back as a response
+
+            socket.emit("user-join-room-response", generateResponsePayload("message", "Successfully joined room", 200));
+            return;
 
         })
 

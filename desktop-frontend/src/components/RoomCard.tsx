@@ -8,6 +8,7 @@ interface roomCardProps {
   idx: number;
   setCurrentRoom: (val: number) => void;
   setIsRoomModalDisplayed: (val: boolean) => void;
+  joinRoom: (val: string) => Promise<void>;
 }
 
 const RoomCard = ({
@@ -18,6 +19,7 @@ const RoomCard = ({
   idx,
   setCurrentRoom,
   setIsRoomModalDisplayed,
+  joinRoom,
 }: roomCardProps) => {
   return (
     <div className="w-9/12 h-32 border-2 border-black rounded-lg overflow-hidden ml-auto mr-auto mt-5">
@@ -36,7 +38,7 @@ const RoomCard = ({
         <button
           className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
           onClick={() => {
-            console.log(id);
+            joinRoom(id);
           }}
         >
           Join Room

@@ -580,6 +580,7 @@ function App() {
                     userEditRoomResponse={userEditRoomResponse}
                     userDeleteRoomResponse={userDeleteRoomResponse}
                     setIsBroadcasting={setIsBroadcasting}
+                    joinRoom={joinRoom}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}

@@ -13,6 +13,7 @@ interface Props {
   userEditRoomResponse: any;
   userDeleteRoomResponse: any;
   setIsBroadcasting: (val: boolean) => void;
+  joinRoom: (val: string) => Promise<void>;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -28,6 +29,7 @@ const Home = ({
   userEditRoomResponse,
   userDeleteRoomResponse,
   setIsBroadcasting,
+  joinRoom,
   createNewRoom,
   editRoom,
   deleteRoom,
@@ -55,6 +57,7 @@ const Home = ({
             idx={idx}
             setCurrentRoom={setCurrentRoom}
             setIsRoomModalDisplayed={setIsRoomModalDisplayed}
+            joinRoom={joinRoom}
           ></RoomCard>
         ))}
       </>
