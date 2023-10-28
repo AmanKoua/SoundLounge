@@ -602,6 +602,65 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-leave-room
+
+        socket.on("user-leave-room", async (payload) => {
+
+            if (!payload) {
+                socket.emit("user-leave-room-response", generateResponsePayload("error", "No leave room payload!", 400));
+                return;
+            }
+
+            if (!payload.token) {
+                socket.emit("user-leave-room-response", generateResponsePayload("error", "No token for leave room request", 400));
+                return;
+            }
+
+            const token = payload.token;
+            let userId;
+
+            try {
+                userId = jwt.verify(token, process.env.JWTSECRET)
+            } catch (e) {
+                socket.emit("user-leave-room-response", generateResponsePayload("error", "Unauthorized leave room request!", 401));
+                return;
+            }
+
+            const user = await User.findOne({ _id: userId });
+
+            if (!user) {
+                socket.emit("user-leave-room-response", generateResponsePayload("error", "No user found for provided token!", 404));
+                return;
+            }
+
+            let currentUserRooms = socket.rooms;
+
+            if (currentUserRooms) {
+
+                let currentUserRoomsIterator = currentUserRooms.values();
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+
+                    temp = currentUserRoomsIterator.next();
+
+                    if (!temp.value || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    socket.leave(temp.value);
+
+                }
+
+            }
+
+            socket.emit("user-leave-room-response", generateResponsePayload("message", "successfully left room!", 200));
+            return;
+
+        })
+
         // user-get-friends-list
 
         socket.on("user-get-friends-list", async (payload) => {

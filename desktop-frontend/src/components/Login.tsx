@@ -94,7 +94,7 @@ const Login = ({ login, userLoginResponse }: loginProps) => {
                 setTimeout(() => {
                   // Wait for a second and a half to get signup response
                   setTriggerResponse(true);
-                }, 1500);
+                }, 500);
               }}
             >
               Log in

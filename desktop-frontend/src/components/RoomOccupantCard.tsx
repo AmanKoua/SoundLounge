@@ -5,8 +5,6 @@ interface Props {
 }
 
 const RoomOccupantCard = ({ occupantData }: Props) => {
-  console.log(occupantData);
-
   return (
     <div className="w-5/12 h-full shadow-lg flex flex-row justify-around">
       <p className="w-max h-max mt-auto mb-auto p-1">{occupantData.email}</p>

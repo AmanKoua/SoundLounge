@@ -245,6 +245,13 @@ function App() {
         setIsInRoom(true);
       });
 
+      // Socket - leave room response
+
+      socket.on("user-leave-room-response", (payload) => {
+        console.log("Leave room response payload : ");
+        console.log(payload);
+      });
+
       // Socket - receive create room response
 
       socket.on("user-create-room-response", (payload) => {
@@ -487,6 +494,23 @@ function App() {
 
   const leaveRoom = () => {
     // TODO : Emit event to leave room on backend
+    if (!socket) {
+      alert("Cannot leave room because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to leave room!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+    };
+
+    socket.emit("user-leave-room", payload);
 
     setIsInRoom(false);
   };
