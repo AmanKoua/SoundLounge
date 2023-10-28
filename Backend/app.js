@@ -491,7 +491,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             socket.userId = user._id.toString();
             socket.email = user.email;
-            socket.isBroadcasting = undefined;
+            socket.isBroadcasting = false;
             socket.isOwner = undefined;
             socket.currentRoom = undefined;
 
@@ -597,7 +597,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
-            socket.emit("user-join-room-response", generateResponsePayload("message", responsePayload, 200));
+            socket.emit("user-join-room-response", generateResponsePayload("message", { occupants: responsePayload, roomId: payload.roomId }, 200));
             return;
 
         })

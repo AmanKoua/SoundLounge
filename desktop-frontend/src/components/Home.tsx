@@ -2,17 +2,22 @@ import { useState } from "react";
 
 import RoomCard from "./RoomCard";
 import RoomModal from "./RoomModal";
+import RoomOccupantCard from "./RoomOccupantCard";
+import BlankRoomOccupantCard from "./BlankRoomOccupantCard";
 
 import { RoomData } from "../customTypes";
 
 interface Props {
   isInRoom: boolean;
+  currentRoomOccupantsData: any;
+  currentRoomData: any;
   userRoomData: any;
   newRoom: RoomData;
   userCreateRoomResponse: any;
   userEditRoomResponse: any;
   userDeleteRoomResponse: any;
   setIsBroadcasting: (val: boolean) => void;
+  leaveRoom: () => void;
   joinRoom: (val: string) => Promise<void>;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
@@ -23,12 +28,15 @@ interface Props {
 
 const Home = ({
   isInRoom,
+  currentRoomOccupantsData,
+  currentRoomData,
   userRoomData,
   newRoom,
   userCreateRoomResponse,
   userEditRoomResponse,
   userDeleteRoomResponse,
   setIsBroadcasting,
+  leaveRoom,
   joinRoom,
   createNewRoom,
   editRoom,
@@ -36,10 +44,10 @@ const Home = ({
   setNewRoom,
 }: Props) => {
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
-  const [currentRoomData, setCurrentRoomData] = useState(newRoom);
+  const [roomModalData, setRoomModalData] = useState(newRoom);
 
   const setCurrentRoom = (idx: number) => {
-    setCurrentRoomData(userRoomData[idx]);
+    setRoomModalData(userRoomData[idx]);
   };
 
   const generateRoomCards: JSX.Element = () => {
@@ -71,7 +79,7 @@ const Home = ({
       <div className="w-full h-screen pt-5">
         {isRoomModalDisplayed && (
           <RoomModal
-            roomData={currentRoomData}
+            roomData={roomModalData}
             userCreateRoomResponse={userCreateRoomResponse}
             userEditRoomResponse={userEditRoomResponse}
             userDeleteRoomResponse={userDeleteRoomResponse}
@@ -133,59 +141,63 @@ const Home = ({
       </div>
     );
   } else {
+    // console.log("-----------");
+    // console.log(currentRoomOccupantsData);
+    // console.log(currentRoomData);
+
     return (
       // Component which is displayed when a user is in a room
       <div className="w-full h-screen flex flex-col justify-center">
         <h1 className="w-max h-max ml-auto mr-auto mb-4 text-4xl">
-          Some room title here
+          {currentRoomData.name}
         </h1>
         <h1 className="w-max h-max ml-auto mr-auto mb-4">
-          Owner: somerando@gmail.com
+          Owner: {currentRoomData.ownerEmail}
         </h1>
         <div className="bg-prodPrimary w-10/12 h-52 ml-auto mr-auto flex flex-col pb-1 justify-around">
           <div className="w-11/12 h-1/4 ml-auto mr-auto flex flex-row justify-around">
-            <div className="w-5/12 h-full shadow-lg flex flex-row justify-around">
-              <p className="w-max h-max mt-auto mb-auto p-1">
-                someuserhere@gmail.com
-              </p>
-              <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-                person
-              </span>
-              <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-                volume_up
-              </span>
-            </div>
-
-            <div className="w-5/12 h-full shadow-lg flex flex-row justify-around">
-              <p className="w-max h-max mt-auto mb-auto p-1">
-                someuserhere@gmail.com
-              </p>
-              <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-                volume_off
-              </span>
-            </div>
+            {currentRoomOccupantsData[0] != undefined && (
+              <RoomOccupantCard
+                occupantData={currentRoomOccupantsData[0]}
+              ></RoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[0] == undefined && (
+              <BlankRoomOccupantCard></BlankRoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[1] != undefined && (
+              <RoomOccupantCard
+                occupantData={currentRoomOccupantsData[0]}
+              ></RoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[1] == undefined && (
+              <BlankRoomOccupantCard></BlankRoomOccupantCard>
+            )}
           </div>
           <div className="w-11/12 h-1/4 ml-auto mr-auto flex flex-row justify-around">
-            <div className="w-5/12 h-full shadow-lg flex flex-row justify-around">
-              <p className="w-max h-max mt-auto mb-auto p-1">
-                someuserhere@gmail.com
-              </p>
-              <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-                volume_off
-              </span>
-            </div>
-
-            <div className="w-5/12 h-full shadow-lg flex flex-row justify-around">
-              <p className="w-max h-max mt-auto mb-auto p-1">
-                someuserhere@gmail.com
-              </p>
-              <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-                volume_off
-              </span>
-            </div>
+            {currentRoomOccupantsData[2] != undefined && (
+              <RoomOccupantCard
+                occupantData={currentRoomOccupantsData[0]}
+              ></RoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[2] == undefined && (
+              <BlankRoomOccupantCard></BlankRoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[3] != undefined && (
+              <RoomOccupantCard
+                occupantData={currentRoomOccupantsData[0]}
+              ></RoomOccupantCard>
+            )}
+            {currentRoomOccupantsData[3] == undefined && (
+              <BlankRoomOccupantCard></BlankRoomOccupantCard>
+            )}
           </div>
           <div className="w-11/12 h-1/4 ml-auto mr-auto flex flex-row justify-around">
-            <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+            <button
+              className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              onClick={() => {
+                leaveRoom();
+              }}
+            >
               Leave Room
             </button>
             <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">

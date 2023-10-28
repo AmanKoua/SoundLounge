@@ -20,11 +20,10 @@ function App() {
   //   rotationTime: 1,
   //   isNewRoom: true,
   // };
-
   const [isConnected, setIsConnected] = useState(false);
   const [isUploadInitialized, setIsUploadInitialized] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
-  const [isInRoom, setIsInRoom] = useState(true);
+  const [isInRoom, setIsInRoom] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
   const [audioStreamSettings, setAudioStreamSettings] = useState(undefined);
   const [socket, setSocket] = useState(undefined);
@@ -42,8 +41,10 @@ function App() {
     useState<any>(undefined);
   const [userDeleteRoomResponse, setUserDeleteRoomResponse] =
     useState<any>(undefined);
-  const [currentRoomData, setCurrentRoomData] = useState<any>(undefined);
-  const [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
+  let [currentRoomOccupantsData, setCurrentRoomOccupantsData] =
+    useState<any>(undefined);
+  let [currentRoomData, setCurrentRoomData] = useState<any>(undefined);
+  let [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
   const [newRoom, setNewRoom] = useState({
     name: "",
     description: "",
@@ -197,8 +198,51 @@ function App() {
       // Socket - user join room response
 
       socket.on("user-join-room-response", (payload) => {
-        console.log(payload);
+        // console.log(payload);
         setUserJoinRoomResponse(payload);
+        setCurrentRoomOccupantsData(payload.data.occupants);
+        currentRoomOccupantsData = payload.data.occupants;
+
+        if (payload.type == "error") {
+          alert(payload.data);
+          return;
+        }
+
+        if (userRoomData.length == 0) {
+          const token = localStorage.getItem("user");
+
+          if (!token) {
+            alert("Cannot get user rooms because there is no access token!");
+            return;
+          }
+
+          socket.emit("user-get-rooms", { token: token });
+          alert("Refetching rooms before joining room!");
+          return;
+        }
+
+        const roomId = payload.data.roomId;
+        let isRoomInRoomData = undefined;
+
+        for (let i = 0; i < userRoomData.length; i++) {
+          if (userRoomData[i].id == roomId) {
+            isRoomInRoomData = true;
+            setCurrentRoomData(userRoomData[i]);
+            currentRoomData = userRoomData[i];
+            break;
+          } else {
+            isRoomInRoomData = false;
+          }
+        }
+
+        if (!isRoomInRoomData) {
+          alert("Fatal error when joining room!");
+          console.log(userRoomData);
+          console.log(payload.data.roomId);
+          return;
+        }
+
+        setIsInRoom(true);
       });
 
       // Socket - receive create room response
@@ -247,10 +291,9 @@ function App() {
       // Socket - Receive get rooms repsonse
 
       socket.on("user-get-rooms-response", (payload) => {
-        console.log("user get rooms response!", payload.data.rooms);
-
         if (payload.type != "error") {
           setUserRoomData(payload.data.rooms);
+          userRoomData = payload.data.rooms; // workaround for state not updating properly when using setUserRoomData (very strange bug)
         } else {
           console.log(payload);
         }
@@ -442,6 +485,12 @@ function App() {
     socket.emit("user-join-room", payload);
   };
 
+  const leaveRoom = () => {
+    // TODO : Emit event to leave room on backend
+
+    setIsInRoom(false);
+  };
+
   const getFriendsList = () => {
     if (!socket) {
       alert("Cannot get friends list because socket is not initialized!");
@@ -584,12 +633,15 @@ function App() {
                 element={
                   <Home
                     isInRoom={isInRoom}
+                    currentRoomOccupantsData={currentRoomOccupantsData}
+                    currentRoomData={currentRoomData}
                     userRoomData={userRoomData}
                     newRoom={newRoom}
                     userCreateRoomResponse={userCreateRoomResponse}
                     userEditRoomResponse={userEditRoomResponse}
                     userDeleteRoomResponse={userDeleteRoomResponse}
                     setIsBroadcasting={setIsBroadcasting}
+                    leaveRoom={leaveRoom}
                     joinRoom={joinRoom}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
