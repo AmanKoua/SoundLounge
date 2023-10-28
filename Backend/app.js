@@ -392,10 +392,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 rooms: [], // [RoomData, ...]
             }
 
-            /*
-                TODO : Get the rooms available to the user's friends as well
-            */
-
             const userRoomsList = tempUsers[0].roomsList;
 
             for (let i = 0; i < userRoomsList.length; i++) {
@@ -417,6 +413,39 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 }
 
                 resPayload.rooms.push(tempRoomData);
+            }
+
+            for (let j = 0; j < tempUsers[0].friendsList.length; j++) {
+
+                const tempFriend = await User.findOne({ _id: tempUsers[0].friendsList[j] });
+
+                if (!tempFriend) {
+                    continue;
+                }
+
+                const tempFriendRoomsList = tempFriend.roomsList;
+
+                for (let i = 0; i < tempFriendRoomsList.length; i++) {
+
+                    const room = await Room.findOne({ _id: tempFriendRoomsList[i] });
+
+                    if (room == null || room == undefined) {
+                        continue;
+                    }
+
+                    let tempRoomData = {
+                        id: room._id,
+                        ownerEmail: tempFriend.email,
+                        name: room.name,
+                        description: room.description,
+                        audioControlConfiguration: room.audioControlMode,
+                        rotationTime: room.rotationTimer,
+                        isNewRoom: false,
+                    }
+
+                    resPayload.rooms.push(tempRoomData);
+                }
+
             }
 
             socket.emit("user-get-rooms-response", generateResponsePayload("message", resPayload, 200));
@@ -485,7 +514,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
                     if (!temp.value || temp.done == true) {
                         isFinished = true;
-                        return;
+                        break;
                     }
 
                     socket.leave(temp.value);
@@ -521,6 +550,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
             if (occupantsList.length < 4) {
                 socket.join(`${payload.roomId}`);
+                occupantsList.push(socket.userId);
             }
             else {
                 socket.emit("user-join-room-response", generateResponsePayload("error", "Cannot join full room!", 500));
@@ -528,8 +558,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             console.log(occupantsList);
-
-            // TODO : Retieve data regarding the users in the room and send it back as a response
 
             socket.emit("user-join-room-response", generateResponsePayload("message", "Successfully joined room", 200));
             return;
