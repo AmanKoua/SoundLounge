@@ -166,7 +166,7 @@ const Home = ({
             )}
             {currentRoomOccupantsData[1] != undefined && (
               <RoomOccupantCard
-                occupantData={currentRoomOccupantsData[0]}
+                occupantData={currentRoomOccupantsData[1]}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[1] == undefined && (
@@ -176,7 +176,7 @@ const Home = ({
           <div className="w-11/12 h-1/4 ml-auto mr-auto flex flex-row justify-around">
             {currentRoomOccupantsData[2] != undefined && (
               <RoomOccupantCard
-                occupantData={currentRoomOccupantsData[0]}
+                occupantData={currentRoomOccupantsData[2]}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[2] == undefined && (
@@ -184,7 +184,7 @@ const Home = ({
             )}
             {currentRoomOccupantsData[3] != undefined && (
               <RoomOccupantCard
-                occupantData={currentRoomOccupantsData[0]}
+                occupantData={currentRoomOccupantsData[3]}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[3] == undefined && (
