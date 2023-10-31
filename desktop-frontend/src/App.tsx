@@ -33,8 +33,6 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
-  let isPendingJoinRoom = false;
-  // let [isPendingJoinRoom, setIsPendingJoinRoom] = useState(false);
   const [userJoinRoomResponse, setUserJoinRoomResponse] =
     useState<any>(undefined);
   const [userCreateRoomResponse, setUserCreateRoomResponse] =
@@ -337,8 +335,6 @@ function App() {
           console.log("----------- Rooms Fetched Successfully! ------------ ");
           setUserRoomData(payload.data.rooms);
           userRoomData = payload.data.rooms; // workaround for state not updating properly when using setUserRoomData (very strange bug)
-          // setIsPendingJoinRoom(false);
-          isPendingJoinRoom = false;
         } else {
           console.log(payload);
         }
@@ -528,63 +524,26 @@ function App() {
     };
 
     // Fetch room data again before joining room
-
-    // setIsPendingJoinRoom(true);
-    isPendingJoinRoom = true;
     console.log(
-      " ------------ refetching rooms request before joining room! -------------------- "
+      "---------------- refetching user rooms ------------------------"
     );
+    socket.emit("user-get-rooms", { token: payload.token });
 
-    const waitForPendingJoinRoomToBeTrue = () => {
-      console.log(
-        "-------------------- wait for pending join room to be true was called! ---------------------------"
-      );
+    const sleep = (time: number) => {
+      // sleeping utility function
+      console.log("---------------- sleeping .... ------------------------");
 
       return new Promise((res, rej) => {
-        const temp = setInterval(() => {
-          if (isPendingJoinRoom == true) {
-            console.log(
-              "--------------- is pending join room turned positive! ----------------------"
-            );
-            socket.emit("user-get-rooms", { token: payload.token });
-            res("");
-            clearInterval(temp);
-          } else if (isPendingJoinRoom == false) {
-            console.log(
-              "--------------- is pending join room NOT positive! ----------------------"
-            );
-          } else {
-            console.log(
-              "--------------------- pending interval!!! --------------------------",
-              isPendingJoinRoom
-            );
-          }
-        }, 5);
+        setTimeout(() => {
+          res("");
+        }, time);
       });
     };
 
-    const waitForRoomsRefetch = () => {
-      return new Promise((res, rej) => {
-        const temp = setInterval(() => {
-          console.log(
-            " ---------------- waiting for room refetch ... ----------------------"
-          );
-          if (isPendingJoinRoom == false) {
-            console.log(
-              " -------------------------- room refetched ! --------------------"
-            );
-            clearInterval(temp);
-            res("");
-          }
-        }, 200);
-      });
-    };
-
-    await waitForPendingJoinRoomToBeTrue();
-    await waitForRoomsRefetch();
+    await sleep(500);
 
     console.log(
-      " -------------------------- emitting join room request ------------------------"
+      "-------------------------- joining room --------------------------------"
     );
     socket.emit("user-join-room", payload);
   };
