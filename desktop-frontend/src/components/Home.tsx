@@ -142,8 +142,13 @@ const Home = ({
     );
   } else {
     // console.log("-----------");
-    // console.log(currentRoomOccupantsData);
-    // console.log(currentRoomData);
+    console.log(currentRoomOccupantsData);
+    console.log(currentRoomData);
+
+    let audioControlModeText =
+      currentRoomData.audioControlConfiguration == 1
+        ? `Automatic Rotation (${currentRoomData.rotationTime} mins)`
+        : "Owner Grants Control";
 
     return (
       // Component which is displayed when a user is in a room
@@ -153,6 +158,9 @@ const Home = ({
         </h1>
         <h1 className="w-max h-max ml-auto mr-auto mb-4">
           Owner: {currentRoomData.ownerEmail}
+        </h1>
+        <h1 className="w-max h-max ml-auto mr-auto mb-4">
+          Audio control mode: {audioControlModeText}
         </h1>
         <div className="bg-prodPrimary w-10/12 h-52 ml-auto mr-auto flex flex-col pb-1 justify-around">
           <div className="w-11/12 h-1/4 ml-auto mr-auto flex flex-row justify-around">
@@ -200,9 +208,18 @@ const Home = ({
             >
               Leave Room
             </button>
-            <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
-              Request audio control
-            </button>
+
+            {currentRoomData.audioControlConfiguration == 1 && ( // automatic rotation
+              <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30">
+                Request audio control
+              </button>
+            )}
+
+            {currentRoomData.audioControlConfiguration == 0 && ( // owner grant authorization
+              <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+                Request audio control
+              </button>
+            )}
           </div>
         </div>
       </div>
