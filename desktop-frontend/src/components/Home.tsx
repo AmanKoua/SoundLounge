@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import RoomCard from "./RoomCard";
 import RoomModal from "./RoomModal";
@@ -45,6 +45,22 @@ const Home = ({
 }: Props) => {
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
   const [roomModalData, setRoomModalData] = useState(newRoom);
+
+  const [isRoomOwner, setIsRoomOwner] = useState(false);
+
+  useEffect(() => {
+    let storedUserEmail = localStorage.getItem("email");
+
+    if (!currentRoomData || !currentRoomData.ownerEmail || !storedUserEmail) {
+      return;
+    }
+
+    if (currentRoomData.ownerEmail == storedUserEmail) {
+      setIsRoomOwner(true);
+    } else {
+      setIsRoomOwner(false);
+    }
+  }, [currentRoomData]);
 
   const setCurrentRoom = (idx: number) => {
     setRoomModalData(userRoomData[idx]);
@@ -142,8 +158,11 @@ const Home = ({
     );
   } else {
     // console.log("-----------");
-    console.log(currentRoomOccupantsData);
-    console.log(currentRoomData);
+    // console.log(currentRoomOccupantsData);
+    // console.log(currentRoomData);
+
+    // alert(currentRoomData.ownerEmail);
+    // alert(localStorage.getItem("email"));
 
     let audioControlModeText =
       currentRoomData.audioControlConfiguration == 1
@@ -211,13 +230,13 @@ const Home = ({
 
             {currentRoomData.audioControlConfiguration == 1 && ( // automatic rotation
               <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30">
-                Request audio control
+                {isRoomOwner ? "Grant audio control" : "Request audio control"}
               </button>
             )}
 
             {currentRoomData.audioControlConfiguration == 0 && ( // owner grant authorization
               <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
-                Request audio control
+                {isRoomOwner ? "Grant audio control" : "Request audio control"}
               </button>
             )}
           </div>
