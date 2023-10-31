@@ -9,3 +9,8 @@ whose buffer is the recently decoded blob. Play the blob from from 0. Do this fo
 
 I just verified that it might not be a server issue. When playin the audio blobs as audio
 elements directly retireved from the mediaRecorder listener, the same issue persists!
+
+-----------------------------------------------------------------------------------
+
+    - Before you join a room, you will re-query the backend to retrieve rooms in order
+        to ensure that you are joining the room with the most up to date settings.

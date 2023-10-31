@@ -33,6 +33,8 @@ function App() {
 
   const [userSignupResponse, setUserSignupResponse] = useState<any>(undefined);
   const [userLoginResponse, setUserLoginResponse] = useState<any>(undefined);
+  let isPendingJoinRoom = false;
+  // let [isPendingJoinRoom, setIsPendingJoinRoom] = useState(false);
   const [userJoinRoomResponse, setUserJoinRoomResponse] =
     useState<any>(undefined);
   const [userCreateRoomResponse, setUserCreateRoomResponse] =
@@ -242,6 +244,13 @@ function App() {
 
           socket.emit("user-get-rooms", { token: token });
           alert("Refetching rooms before joining room!");
+
+          /*
+            A very strange bug occurs here. When joining rooms, the userRoomData state is empty.
+            This should be impossible, yet occurs. It is for this reason that the workaround is
+            implemented in the user-get-rooms-response event handler.
+          */
+
           return;
         }
 
@@ -322,9 +331,14 @@ function App() {
       // Socket - Receive get rooms repsonse
 
       socket.on("user-get-rooms-response", (payload) => {
+        // alert("room fetched! ----");
+
         if (payload.type != "error") {
+          console.log("----------- Rooms Fetched Successfully! ------------ ");
           setUserRoomData(payload.data.rooms);
           userRoomData = payload.data.rooms; // workaround for state not updating properly when using setUserRoomData (very strange bug)
+          // setIsPendingJoinRoom(false);
+          isPendingJoinRoom = false;
         } else {
           console.log(payload);
         }
@@ -513,6 +527,65 @@ function App() {
       roomId: roomId,
     };
 
+    // Fetch room data again before joining room
+
+    // setIsPendingJoinRoom(true);
+    isPendingJoinRoom = true;
+    console.log(
+      " ------------ refetching rooms request before joining room! -------------------- "
+    );
+
+    const waitForPendingJoinRoomToBeTrue = () => {
+      console.log(
+        "-------------------- wait for pending join room to be true was called! ---------------------------"
+      );
+
+      return new Promise((res, rej) => {
+        const temp = setInterval(() => {
+          if (isPendingJoinRoom == true) {
+            console.log(
+              "--------------- is pending join room turned positive! ----------------------"
+            );
+            socket.emit("user-get-rooms", { token: payload.token });
+            res("");
+            clearInterval(temp);
+          } else if (isPendingJoinRoom == false) {
+            console.log(
+              "--------------- is pending join room NOT positive! ----------------------"
+            );
+          } else {
+            console.log(
+              "--------------------- pending interval!!! --------------------------",
+              isPendingJoinRoom
+            );
+          }
+        }, 5);
+      });
+    };
+
+    const waitForRoomsRefetch = () => {
+      return new Promise((res, rej) => {
+        const temp = setInterval(() => {
+          console.log(
+            " ---------------- waiting for room refetch ... ----------------------"
+          );
+          if (isPendingJoinRoom == false) {
+            console.log(
+              " -------------------------- room refetched ! --------------------"
+            );
+            clearInterval(temp);
+            res("");
+          }
+        }, 200);
+      });
+    };
+
+    await waitForPendingJoinRoomToBeTrue();
+    await waitForRoomsRefetch();
+
+    console.log(
+      " -------------------------- emitting join room request ------------------------"
+    );
     socket.emit("user-join-room", payload);
   };
 
