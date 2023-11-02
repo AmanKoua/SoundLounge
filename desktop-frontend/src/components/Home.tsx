@@ -75,7 +75,7 @@ const Home = ({
     for (let i = 0; i < currentRoomOccupantsData.length; i++) {
       if (currentRoomOccupantsData[i].email == localStorage.getItem("email")) {
         setIsUserRequestionAudioControls(
-          currentRoomOccupantsData[i].isRequestionAudioControl
+          currentRoomOccupantsData[i].isRequestingAudioControl
         );
         break;
       }

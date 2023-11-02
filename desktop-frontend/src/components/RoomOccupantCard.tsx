@@ -81,6 +81,9 @@ const RoomOccupantCard = ({
           );
           setAudioControlApprovalState("");
         }}
+        onClick={() => {
+          alert(audioControlApprovalState);
+        }}
       >
         <p className="w-max h-max mt-auto mb-auto p-1">
           {audioControlApprovalState == ""
