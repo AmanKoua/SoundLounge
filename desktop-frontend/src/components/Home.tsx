@@ -88,6 +88,28 @@ const Home = ({
     );
   };
 
+  const generateAudioControlButtons = (): JSX.Element => {
+    if (!isRoomOwner) {
+      return (
+        <>
+          {currentRoomData.audioControlConfiguration == 1 && ( // automatic rotation
+            <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30">
+              {isRoomOwner ? "Grant audio control" : "Request audio control"}
+            </button>
+          )}
+
+          {currentRoomData.audioControlConfiguration == 0 && ( // owner grant authorization
+            <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+              {isRoomOwner ? "Grant audio control" : "Request audio control"}
+            </button>
+          )}
+        </>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
   if (!isInRoom) {
     // refactor this into multiple components later
     return (
@@ -228,17 +250,7 @@ const Home = ({
               Leave Room
             </button>
 
-            {currentRoomData.audioControlConfiguration == 1 && ( // automatic rotation
-              <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30">
-                {isRoomOwner ? "Grant audio control" : "Request audio control"}
-              </button>
-            )}
-
-            {currentRoomData.audioControlConfiguration == 0 && ( // owner grant authorization
-              <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
-                {isRoomOwner ? "Grant audio control" : "Request audio control"}
-              </button>
-            )}
+            {generateAudioControlButtons()}
           </div>
         </div>
       </div>

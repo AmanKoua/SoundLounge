@@ -13,7 +13,7 @@ const RoomOccupantCard = ({ occupantData }: Props) => {
   const [audioControlApprovalState, setAudioControlApprovalState] =
     useState("");
   const [isPendingAudioControlResponse, setIsPendingAudioControlResponse] =
-    useState(true);
+    useState(false);
 
   useEffect(() => {
     if (!divRef || !divRef.current) {
