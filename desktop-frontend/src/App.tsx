@@ -524,14 +524,14 @@ function App() {
     };
 
     // Fetch room data again before joining room
-    console.log(
-      "---------------- refetching user rooms ------------------------"
-    );
+    // console.log(
+    //   "---------------- refetching user rooms ------------------------"
+    // );
     socket.emit("user-get-rooms", { token: payload.token });
 
     const sleep = (time: number) => {
       // sleeping utility function
-      console.log("---------------- sleeping .... ------------------------");
+      // console.log("---------------- sleeping .... ------------------------");
 
       return new Promise((res, rej) => {
         setTimeout(() => {
@@ -542,9 +542,9 @@ function App() {
 
     await sleep(500);
 
-    console.log(
-      "-------------------------- joining room --------------------------------"
-    );
+    // console.log(
+    //   "-------------------------- joining room --------------------------------"
+    // );
     socket.emit("user-join-room", payload);
   };
 
