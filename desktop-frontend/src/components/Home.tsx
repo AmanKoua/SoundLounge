@@ -208,6 +208,8 @@ const Home = ({
             {currentRoomOccupantsData[0] != undefined && (
               <RoomOccupantCard
                 occupantData={currentRoomOccupantsData[0]}
+                currentRoomData={currentRoomData}
+                isRoomOwner={isRoomOwner}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[0] == undefined && (
@@ -216,6 +218,8 @@ const Home = ({
             {currentRoomOccupantsData[1] != undefined && (
               <RoomOccupantCard
                 occupantData={currentRoomOccupantsData[1]}
+                currentRoomData={currentRoomData}
+                isRoomOwner={isRoomOwner}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[1] == undefined && (
@@ -226,6 +230,8 @@ const Home = ({
             {currentRoomOccupantsData[2] != undefined && (
               <RoomOccupantCard
                 occupantData={currentRoomOccupantsData[2]}
+                currentRoomData={currentRoomData}
+                isRoomOwner={isRoomOwner}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[2] == undefined && (
@@ -234,6 +240,8 @@ const Home = ({
             {currentRoomOccupantsData[3] != undefined && (
               <RoomOccupantCard
                 occupantData={currentRoomOccupantsData[3]}
+                currentRoomData={currentRoomData}
+                isRoomOwner={isRoomOwner}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[3] == undefined && (

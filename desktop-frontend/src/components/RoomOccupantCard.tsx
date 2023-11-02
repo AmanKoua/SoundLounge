@@ -2,9 +2,15 @@ import { useRef, useState, useEffect } from "react";
 
 interface Props {
   occupantData: any;
+  currentRoomData: any;
+  isRoomOwner: boolean;
 }
 
-const RoomOccupantCard = ({ occupantData }: Props) => {
+const RoomOccupantCard = ({
+  occupantData,
+  currentRoomData,
+  isRoomOwner,
+}: Props) => {
   const divRef = useRef(null);
   const [midPoint, setMidPoint] = useState(0);
   const [divClassName, setDivClassName] = useState(
@@ -25,12 +31,26 @@ const RoomOccupantCard = ({ occupantData }: Props) => {
     setMidPoint(temp.left + (temp.right - temp.left) / 2);
   }, [divRef]);
 
+  useEffect(() => {
+    setIsPendingAudioControlResponse(occupantData.isRequestionAudioControl);
+
+    if (occupantData.isRequestionAudioControl) {
+      setDivClassName(
+        "bg-yellow-200 w-5/12 h-full shadow-lg animate-pulse flex flex-row justify-around"
+      );
+    }
+  }, [occupantData]);
+
   return (
     <>
       <div
         ref={divRef}
         className={divClassName}
         onMouseMove={(e) => {
+          if (!isRoomOwner) {
+            return;
+          }
+
           if (midPoint == 0 || !isPendingAudioControlResponse) {
             return;
           }

@@ -513,6 +513,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             socket.userId = user._id.toString();
             socket.email = user.email;
             socket.isBroadcasting = false;
+            socket.isRequestionAudioControl = true;
             socket.isOwner = undefined;
             socket.currentRoom = undefined;
 
@@ -725,6 +726,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                         id: tempSocket.userId,
                         isOwner: tempSocket.isOwner,
                         isBroadcasting: tempSocket.isBroadcasting,
+                        isRequestionAudioControl: tempSocket.isRequestionAudioControl,
                     }
 
                     responsePayload.push(tempUserProfileSlice);
