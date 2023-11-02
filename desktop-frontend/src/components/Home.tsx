@@ -19,6 +19,7 @@ interface Props {
   setIsBroadcasting: (val: boolean) => void;
   leaveRoom: () => void;
   joinRoom: (val: string) => Promise<void>;
+  requestAudioControl: () => void;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -38,15 +39,19 @@ const Home = ({
   setIsBroadcasting,
   leaveRoom,
   joinRoom,
+  requestAudioControl,
   createNewRoom,
   editRoom,
   deleteRoom,
   setNewRoom,
 }: Props) => {
+  // console.log(currentRoomOccupantsData);
+
   const [isRoomModalDisplayed, setIsRoomModalDisplayed] = useState(false);
   const [roomModalData, setRoomModalData] = useState(newRoom);
-
   const [isRoomOwner, setIsRoomOwner] = useState(false);
+  const [isUserRequestingAudioControls, setIsUserRequestionAudioControls] =
+    useState(false);
 
   useEffect(() => {
     let storedUserEmail = localStorage.getItem("email");
@@ -61,6 +66,21 @@ const Home = ({
       setIsRoomOwner(false);
     }
   }, [currentRoomData]);
+
+  useEffect(() => {
+    if (!currentRoomOccupantsData || currentRoomOccupantsData.length == 0) {
+      return;
+    }
+
+    for (let i = 0; i < currentRoomOccupantsData.length; i++) {
+      if (currentRoomOccupantsData[i].email == localStorage.getItem("email")) {
+        setIsUserRequestionAudioControls(
+          currentRoomOccupantsData[i].isRequestionAudioControl
+        );
+        break;
+      }
+    }
+  }, [currentRoomOccupantsData]);
 
   const setCurrentRoom = (idx: number) => {
     setRoomModalData(userRoomData[idx]);
@@ -98,8 +118,21 @@ const Home = ({
             </button>
           )}
 
-          {currentRoomData.audioControlConfiguration == 0 && ( // owner grant authorization
-            <button className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block">
+          {currentRoomData.audioControlConfiguration == 0 && (
+            <button
+              className={
+                isUserRequestingAudioControls
+                  ? "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30"
+                  : "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              }
+              onClick={() => {
+                if (isUserRequestingAudioControls) {
+                  return;
+                }
+
+                requestAudioControl();
+              }}
+            >
               {isRoomOwner ? "Grant audio control" : "Request audio control"}
             </button>
           )}

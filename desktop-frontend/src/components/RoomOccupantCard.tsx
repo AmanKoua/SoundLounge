@@ -32,12 +32,16 @@ const RoomOccupantCard = ({
   }, [divRef]);
 
   useEffect(() => {
-    setIsPendingAudioControlResponse(occupantData.isRequestionAudioControl);
+    console.log(occupantData.isRequestingAudioControl, occupantData.email);
 
-    if (occupantData.isRequestionAudioControl) {
+    setIsPendingAudioControlResponse(occupantData.isRequestingAudioControl);
+
+    if (occupantData.isRequestingAudioControl) {
       setDivClassName(
         "bg-yellow-200 w-5/12 h-full shadow-lg animate-pulse flex flex-row justify-around"
       );
+    } else {
+      setDivClassName("w-5/12 h-full shadow-lg flex flex-row justify-around");
     }
   }, [occupantData]);
 

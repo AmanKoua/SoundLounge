@@ -513,7 +513,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             socket.userId = user._id.toString();
             socket.email = user.email;
             socket.isBroadcasting = false;
-            socket.isRequestionAudioControl = true;
+            socket.isRequestingAudioControl = false;
             socket.isOwner = undefined;
             socket.currentRoom = undefined;
 
@@ -684,6 +684,34 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-request-audio-control
+
+        socket.on("user-request-audio-control", async () => {
+
+            socket.isRequestingAudioControl = true;
+            let currentUserRooms = socket.rooms;
+
+            if (currentUserRooms) {
+
+                let currentUserRoomsIterator = currentUserRooms.values();
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+
+                    temp = currentUserRoomsIterator.next();
+
+                    if (!temp.value || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+                }
+            }
+
+        })
+
         // user-get-room-state
 
         socket.on("user-get-room-state", async (payload) => {
@@ -726,7 +754,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                         id: tempSocket.userId,
                         isOwner: tempSocket.isOwner,
                         isBroadcasting: tempSocket.isBroadcasting,
-                        isRequestionAudioControl: tempSocket.isRequestionAudioControl,
+                        isRequestingAudioControl: tempSocket.isRequestingAudioControl,
                     }
 
                     responsePayload.push(tempUserProfileSlice);

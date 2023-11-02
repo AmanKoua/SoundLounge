@@ -332,7 +332,7 @@ function App() {
         // alert("room fetched! ----");
 
         if (payload.type != "error") {
-          console.log("----------- Rooms Fetched Successfully! ------------ ");
+          // console.log("----------- Rooms Fetched Successfully! ------------ ");
           setUserRoomData(payload.data.rooms);
           userRoomData = payload.data.rooms; // workaround for state not updating properly when using setUserRoomData (very strange bug)
         } else {
@@ -571,6 +571,30 @@ function App() {
     setIsInRoom(false);
   };
 
+  const requestAudioControl = async () => {
+    if (!socket) {
+      alert("Cannot request audio control because socket is not initialized!");
+      return;
+    }
+
+    const userToken = localStorage.getItem("user");
+
+    if (!userToken) {
+      alert("Must be signed in to join room!");
+      return;
+    }
+
+    const payload = {
+      token: userToken,
+    };
+
+    // Fetch room data again before joining room
+    // console.log(
+    //   "---------------- refetching user rooms ------------------------"
+    // );
+    socket.emit("user-request-audio-control");
+  };
+
   const getFriendsList = () => {
     if (!socket) {
       alert("Cannot get friends list because socket is not initialized!");
@@ -723,6 +747,7 @@ function App() {
                     setIsBroadcasting={setIsBroadcasting}
                     leaveRoom={leaveRoom}
                     joinRoom={joinRoom}
+                    requestAudioControl={requestAudioControl}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}
