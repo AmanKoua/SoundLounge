@@ -596,8 +596,6 @@ function App() {
   };
 
   const handleAudioControlRequest = async (id: string, isAccepted: boolean) => {
-    console.log(id, isAccepted);
-
     const payload = {
       id: id,
       isAccepted: isAccepted,

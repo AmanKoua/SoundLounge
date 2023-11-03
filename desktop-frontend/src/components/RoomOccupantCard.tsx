@@ -88,13 +88,15 @@ const RoomOccupantCard = ({
             return;
           }
 
-          setAudioControlApprovalState("");
-
           if (isPendingAudioControlResponse) {
             handleAudioControlRequest(
               occupantData.id,
               audioControlApprovalState == "Accept request"
             );
+
+            setTimeout(() => {
+              setAudioControlApprovalState("");
+            }, 100);
           }
         }}
       >
@@ -105,7 +107,7 @@ const RoomOccupantCard = ({
         </p>
         {occupantData.isOwner && (
           <span className="material-symbols-outlined h-max w-max mt-auto mb-auto">
-            person
+            star
           </span>
         )}
 

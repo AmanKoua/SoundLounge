@@ -155,7 +155,38 @@ const Home = ({
         </>
       );
     } else {
-      return <></>;
+      return (
+        <>
+          {currentRoomData.audioControlConfiguration == 0 && (
+            <button
+              className={
+                isUserRequestingAudioControls || isUserBroadcasting
+                  ? "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30"
+                  : "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+              }
+              onClick={() => {
+                if (isUserRequestingAudioControls || isUserBroadcasting) {
+                  return;
+                }
+
+                for (let i = 0; i < currentRoomOccupantsData.length; i++) {
+                  if (
+                    (currentRoomOccupantsData[i].email =
+                      localStorage.getItem("email"))
+                  ) {
+                    handleAudioControlRequest(
+                      currentRoomOccupantsData[i].id,
+                      true
+                    );
+                  }
+                }
+              }}
+            >
+              Seize audio control
+            </button>
+          )}
+        </>
+      );
     }
   };
 
@@ -231,9 +262,6 @@ const Home = ({
     // console.log("-----------");
     // console.log(currentRoomOccupantsData);
     // console.log(currentRoomData);
-
-    // alert(currentRoomData.ownerEmail);
-    // alert(localStorage.getItem("email"));
 
     let audioControlModeText =
       currentRoomData.audioControlConfiguration == 1
