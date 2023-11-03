@@ -64,12 +64,9 @@ function App() {
 
   let isAudioBuffering = true;
   let audioBufferQueue = [];
+  let bufferLength = 15;
 
   const playAudioPacket = (payload) => {
-    console.log(
-      `-------------------- playing audio packet -------------------------`
-    );
-
     const blob = new Blob([payload.blob], {
       // type: "video/x-matroska;codecs=avc1,opus",
       type: "video/webm;codecs=vp8,opus",
@@ -81,46 +78,20 @@ function App() {
     audioElement.play();
   };
 
-  useEffect(() => {
-    /*
-    Note, it's important that the setInterval time
-    is identical to the size of the audio packet
-    received in order to have smooth playback
-    */
+  const audioPlaybackInterval = setInterval(() => {
+    if (audioBufferQueue.length >= bufferLength) {
+      isAudioBuffering = false;
+    }
 
-    const temp = setInterval(() => {
-      console.log(
-        `-------------------- Audio interval .... -------------------------`
-      );
+    if (!isAudioBuffering && audioBufferQueue.length > 0) {
+      playAudioPacket(audioBufferQueue[0]);
+      audioBufferQueue.splice(0, 1);
 
-      console.log(
-        `-------------------- Audio interval vars ${isAudioBuffering} ${audioBufferQueue.length} -------------------------`
-      );
-
-      let localIsAudioBuffering = true;
-
-      if (audioBufferQueue.length >= 5) {
-        isAudioBuffering = false;
+      if (audioBufferQueue.length == 0) {
+        isAudioBuffering = true;
       }
-
-      if (!localIsAudioBuffering && audioBufferQueue.length > 0) {
-        console.log(
-          `-------------------- Audio interval if block executed! -------------------------`
-        );
-
-        playAudioPacket(audioBufferQueue[0]);
-        audioBufferQueue.splice(0, 1);
-
-        if (audioBufferQueue.length == 0) {
-          isAudioBuffering = true;
-        }
-      }
-    }, 750);
-
-    return () => {
-      clearInterval(temp);
-    };
-  }, []);
+    }
+  }, 750);
 
   useEffect(() => {
     // Initial connection to socket
@@ -227,17 +198,9 @@ function App() {
           return;
         }
 
-        console.log("-------------------- 1-------------------------");
-
         audioBufferQueue.push(payload);
-        console.log(
-          `-------------------- audioBufferQueue length ${audioBufferQueue.length} -------------------------`
-        );
 
-        if (audioBufferQueue.length >= 5 && isAudioBuffering) {
-          console.log(
-            `-------------------- set Is AudioBuffering to false! -------------------------`
-          );
+        if (audioBufferQueue.length >= bufferLength && isAudioBuffering) {
           isAudioBuffering = false;
         }
       });
