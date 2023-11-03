@@ -25,4 +25,5 @@ When the array has 5 or more stored audio packets, pop the 1st element from the 
 and attach it to the audio element. Splice the element from the array. After another 750 ms, 
 repeat the process.
 
-If there's still audio playback lag, use 2 HTMLAudio tags.
+If there's still audio playback lag, use 2 HTMLAudio tags instead of 1 and alternate between
+the 2.

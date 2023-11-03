@@ -62,6 +62,66 @@ function App() {
   const [removeRequestCardResponse, setRemoveRequestCardResponse] =
     useState("");
 
+  let isAudioBuffering = true;
+  let audioBufferQueue = [];
+
+  const playAudioPacket = (payload) => {
+    console.log(
+      `-------------------- playing audio packet -------------------------`
+    );
+
+    const blob = new Blob([payload.blob], {
+      // type: "video/x-matroska;codecs=avc1,opus",
+      type: "video/webm;codecs=vp8,opus",
+    });
+
+    // const audioElement = new Audio(URL.createObjectURL(blob));
+    const audioElement = document.getElementById("audioPlayer");
+    audioElement.src = URL.createObjectURL(blob);
+    audioElement.play();
+  };
+
+  useEffect(() => {
+    /*
+    Note, it's important that the setInterval time
+    is identical to the size of the audio packet
+    received in order to have smooth playback
+    */
+
+    const temp = setInterval(() => {
+      console.log(
+        `-------------------- Audio interval .... -------------------------`
+      );
+
+      console.log(
+        `-------------------- Audio interval vars ${isAudioBuffering} ${audioBufferQueue.length} -------------------------`
+      );
+
+      let localIsAudioBuffering = true;
+
+      if (audioBufferQueue.length >= 5) {
+        isAudioBuffering = false;
+      }
+
+      if (!localIsAudioBuffering && audioBufferQueue.length > 0) {
+        console.log(
+          `-------------------- Audio interval if block executed! -------------------------`
+        );
+
+        playAudioPacket(audioBufferQueue[0]);
+        audioBufferQueue.splice(0, 1);
+
+        if (audioBufferQueue.length == 0) {
+          isAudioBuffering = true;
+        }
+      }
+    }, 750);
+
+    return () => {
+      clearInterval(temp);
+    };
+  }, []);
+
   useEffect(() => {
     // Initial connection to socket
     if (isConnected || audioStream || socket || audioStreamSettings) {
@@ -167,15 +227,19 @@ function App() {
           return;
         }
 
-        const blob = new Blob([payload.blob], {
-          // type: "video/x-matroska;codecs=avc1,opus",
-          type: "video/webm;codecs=vp8,opus",
-        });
+        console.log("-------------------- 1-------------------------");
 
-        // const audioElement = new Audio(URL.createObjectURL(blob));
-        const audioElement = document.getElementById("audioPlayer");
-        audioElement.src = URL.createObjectURL(blob);
-        audioElement.play();
+        audioBufferQueue.push(payload);
+        console.log(
+          `-------------------- audioBufferQueue length ${audioBufferQueue.length} -------------------------`
+        );
+
+        if (audioBufferQueue.length >= 5 && isAudioBuffering) {
+          console.log(
+            `-------------------- set Is AudioBuffering to false! -------------------------`
+          );
+          isAudioBuffering = false;
+        }
       });
 
       // Socket - receive signup response
