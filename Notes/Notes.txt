@@ -14,3 +14,15 @@ elements directly retireved from the mediaRecorder listener, the same issue pers
 
     - Before you join a room, you will re-query the backend to retrieve rooms in order
         to ensure that you are joining the room with the most up to date settings.
+        
+-----------------------------------------------------------------------------------
+
+For buffering mechanism, push each newly received audio packet to an array which will
+serve as a queue. Whenever an item needs to be removed, it will simply be spliced from
+the array.
+
+When the array has 5 or more stored audio packets, pop the 1st element from the array 
+and attach it to the audio element. Splice the element from the array. After another 750 ms, 
+repeat the process.
+
+If there's still audio playback lag, use 2 HTMLAudio tags.
