@@ -77,8 +77,13 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
             console.log("audio packed received!");
-            socket.broadcast.emit("server-audio-packet", blob); // send to all clients except sender!
-            // io.emit("server-audio-packet", blob); // send to all clients, including sender!
+
+            if (!socket.currentRoom) {
+                return;
+            }
+
+            socket.to(socket.currentRoom).emit("server-audio-packet", blob); // send to all clients except sender not working!
+
         })
 
         // User sign up
@@ -1314,7 +1319,3 @@ if (module === require.main) {
         console.log("IO listening on " + PORT);
     });
 }
-
-/*
- Express REST API was removed. Opting do handle everything over socketIO.
-*/

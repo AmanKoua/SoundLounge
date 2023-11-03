@@ -93,6 +93,7 @@ const Home = ({
     for (let i = 0; i < currentRoomOccupantsData.length; i++) {
       if (currentRoomOccupantsData[i].email == localStorage.getItem("email")) {
         setIsUserBroadcasting(currentRoomOccupantsData[i].isBroadcasting);
+        setIsBroadcasting(currentRoomOccupantsData[i].isBroadcasting);
         break;
       }
     }
@@ -222,9 +223,9 @@ const Home = ({
             onChange={(e) => {
               const option = e.target.value;
               if (option === "Broadcast") {
-                setIsBroadcasting(true);
+                // setIsBroadcasting(true);
               } else {
-                setIsBroadcasting(false);
+                // setIsBroadcasting(false);
               }
             }}
             className="w-full ml-auto mr-auto mt-5 shadow-lg"
@@ -271,6 +272,11 @@ const Home = ({
     return (
       // Component which is displayed when a user is in a room
       <div className="w-full h-screen flex flex-col justify-center">
+        <audio
+          id="audioPlayer"
+          controls
+          className="ml-auto mr-auto mt-5"
+        ></audio>
         <h1 className="w-max h-max ml-auto mr-auto mb-4 text-4xl">
           {currentRoomData.name}
         </h1>
@@ -333,6 +339,7 @@ const Home = ({
             <button
               className="p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
               onClick={() => {
+                setIsBroadcasting(false);
                 leaveRoom();
               }}
             >
