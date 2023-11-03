@@ -119,7 +119,10 @@ function App() {
         tempMediaRecorder.addEventListener("dataavailable", async (event) => {
           isBroadcasting = true;
           console.log("Emitting data!");
-          socket.emit("client-audio-packet", event.data); // "video/x-matroska;codecs=avc1,opus"
+          socket.emit("client-audio-packet", {
+            blob: event.data,
+            email: localStorage.getItem("email"),
+          }); // "video/x-matroska;codecs=avc1,opus"
         });
       }
 
@@ -159,24 +162,12 @@ function App() {
 
       // Socket - receive server audio packet
 
-      socket.on("server-audio-packet", (arrayBuffer) => {
-        console.log("----------- received audio packet! ------------");
-
-        console.log(isBroadcasting, " -------- isBroadcasting");
-
-        if (isBroadcasting) {
-          /*
-          Implemnting this workaround for the fact that 
-          the documentation, stackoverflow, and other sources
-          can't seem to provide the correct code to emit events
-          to other socket clients except the sender. this will
-          need to be resolved before finishing up the project
-          */
-          alert("-----");
+      socket.on("server-audio-packet", (payload) => {
+        if (payload.email == localStorage.getItem("email")) {
           return;
         }
 
-        const blob = new Blob([arrayBuffer], {
+        const blob = new Blob([payload.blob], {
           // type: "video/x-matroska;codecs=avc1,opus",
           type: "video/webm;codecs=vp8,opus",
         });

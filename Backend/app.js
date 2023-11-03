@@ -75,14 +75,14 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         // Testing - user gets audio packet (proof of concept)
 
-        socket.on("client-audio-packet", (blob) => { // This should never occur with new backend implementation
+        socket.on("client-audio-packet", (payload) => { // This should never occur with new backend implementation
             console.log("audio packed received!");
 
             if (!socket.currentRoom) {
                 return;
             }
 
-            socket.to(socket.currentRoom).emit("server-audio-packet", blob); // send to all clients except sender not working!
+            socket.to(socket.currentRoom).emit("server-audio-packet", payload); // send to all clients except sender not working!
 
         })
 
