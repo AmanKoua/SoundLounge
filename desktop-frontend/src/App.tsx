@@ -70,9 +70,14 @@ function App() {
   let currentAudioPlayerId = "audioPlayer1"; // audioPlayer1 or audioPlayer2
 
   const playAudioPacket = (payload) => {
-    if (prevAudioElement) {
-      prevAudioElement.play();
-    }
+    setTimeout(() => {
+      if (prevAudioElement) {
+        console.timeEnd();
+        console.time();
+
+        prevAudioElement.play();
+      }
+    }, audioPacketLength - 40);
 
     const blob = new Blob([payload.blob], {
       // type: "video/x-matroska;codecs=avc1,opus",
