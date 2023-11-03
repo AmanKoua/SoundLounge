@@ -62,20 +62,32 @@ function App() {
   const [removeRequestCardResponse, setRemoveRequestCardResponse] =
     useState("");
 
+  const audioPacketLength = 750;
   let isAudioBuffering = true;
   let audioBufferQueue = [];
   let bufferLength = 15;
+  let prevAudioElement = undefined;
+  let currentAudioPlayerId = "audioPlayer1"; // audioPlayer1 or audioPlayer2
 
   const playAudioPacket = (payload) => {
+    if (prevAudioElement) {
+      prevAudioElement.play();
+    }
+
     const blob = new Blob([payload.blob], {
       // type: "video/x-matroska;codecs=avc1,opus",
       type: "video/webm;codecs=vp8,opus",
     });
 
-    // const audioElement = new Audio(URL.createObjectURL(blob));
-    const audioElement = document.getElementById("audioPlayer");
+    const audioElement = document.getElementById(currentAudioPlayerId);
     audioElement.src = URL.createObjectURL(blob);
-    audioElement.play();
+    prevAudioElement = audioElement;
+
+    if (currentAudioPlayerId == "audioPlayer1") {
+      currentAudioPlayerId = "audioPlayer2";
+    } else {
+      currentAudioPlayerId = "audioPlayer1";
+    }
   };
 
   const audioPlaybackInterval = setInterval(() => {
@@ -91,7 +103,7 @@ function App() {
         isAudioBuffering = true;
       }
     }
-  }, 750);
+  }, audioPacketLength);
 
   useEffect(() => {
     // Initial connection to socket
@@ -165,7 +177,7 @@ function App() {
           */
         tempMediaRecorder.stop();
         tempMediaRecorder.start();
-      }, 750);
+      }, audioPacketLength);
 
       setMediaRecorderInterval(tempMediaRecorderInterval);
     } else {
@@ -187,7 +199,7 @@ function App() {
         // mediaRecorder.requestData(); // REQUEST DATA IS COMPLETE WHACK. DO NOT USE UNDER ANY CIRCUMSTANCE!
         tempMediaRecorder.stop();
         tempMediaRecorder.start();
-      }, 750);
+      }, audioPacketLength);
 
       setMediaRecorderInterval(tempMediaRecorderInterval);
 

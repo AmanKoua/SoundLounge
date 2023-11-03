@@ -27,3 +27,25 @@ repeat the process.
 
 If there's still audio playback lag, use 2 HTMLAudio tags instead of 1 and alternate between
 the 2.
+
+Current operation:
+
+    - When an audio payload is received, it's appended to the queue. If the queue size is 
+        greater than the buffer length and audio is buffering, set isAudioBuffring to false.
+
+    - audioPlaybackInterval plays each audio packet in the queue until the queue is empty.
+        When the queue is empty, audio buffering will begin again.
+
+New operation:
+
+    - While 1 audio tag is playing, another will be prepared with the new audio packet.
+
+    - playAudioPacket method
+        An audio packet arrives. If it's the first one, do not play until the 2nd one arrives.
+        Prepare the 1st audio tag.
+
+        When the 2nd one arrives, preprare the 2nd audio tag and play the first one.
+
+        The next call call, play the 2nd audio tag and prepare the 1st one.
+
+        alternate between the 2 audio tags for the previous step.

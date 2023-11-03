@@ -238,7 +238,12 @@ const Home = ({
         {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
         <audio className="tempAudioHolder"></audio>
         <audio
-          id="audioPlayer"
+          id="audioPlayer1"
+          controls
+          className="ml-auto mr-auto mt-5"
+        ></audio>
+        <audio
+          id="audioPlayer2"
           controls
           className="ml-auto mr-auto mt-5"
         ></audio>
@@ -273,7 +278,12 @@ const Home = ({
       // Component which is displayed when a user is in a room
       <div className="w-full h-screen flex flex-col justify-center">
         <audio
-          id="audioPlayer"
+          id="audioPlayer1"
+          controls
+          className="ml-auto mr-auto mt-5"
+        ></audio>
+        <audio
+          id="audioPlayer2"
           controls
           className="ml-auto mr-auto mt-5"
         ></audio>
