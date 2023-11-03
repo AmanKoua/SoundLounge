@@ -88,12 +88,14 @@ const RoomOccupantCard = ({
             return;
           }
 
-          handleAudioControlRequest(
-            occupantData.id,
-            audioControlApprovalState == "Accept request"
-          );
-
           setAudioControlApprovalState("");
+
+          if (isPendingAudioControlResponse) {
+            handleAudioControlRequest(
+              occupantData.id,
+              audioControlApprovalState == "Accept request"
+            );
+          }
         }}
       >
         <p className="w-max h-max mt-auto mb-auto p-1">

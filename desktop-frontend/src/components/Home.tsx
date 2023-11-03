@@ -137,7 +137,7 @@ const Home = ({
           {currentRoomData.audioControlConfiguration == 0 && (
             <button
               className={
-                isUserRequestingAudioControls
+                isUserRequestingAudioControls || isUserBroadcasting
                   ? "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block opacity-30"
                   : "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
               }
