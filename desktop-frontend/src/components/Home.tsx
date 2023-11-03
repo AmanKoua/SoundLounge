@@ -20,6 +20,7 @@ interface Props {
   leaveRoom: () => void;
   joinRoom: (val: string) => Promise<void>;
   requestAudioControl: () => void;
+  handleAudioControlRequest: (id: string, isAccepted: boolean) => Promise<void>;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -40,6 +41,7 @@ const Home = ({
   leaveRoom,
   joinRoom,
   requestAudioControl,
+  handleAudioControlRequest,
   createNewRoom,
   editRoom,
   deleteRoom,
@@ -52,6 +54,7 @@ const Home = ({
   const [isRoomOwner, setIsRoomOwner] = useState(false);
   const [isUserRequestingAudioControls, setIsUserRequestionAudioControls] =
     useState(false);
+  const [isUserBroadcasting, setIsUserBroadcasting] = useState(false);
 
   useEffect(() => {
     let storedUserEmail = localStorage.getItem("email");
@@ -77,6 +80,19 @@ const Home = ({
         setIsUserRequestionAudioControls(
           currentRoomOccupantsData[i].isRequestingAudioControl
         );
+        break;
+      }
+    }
+  }, [currentRoomOccupantsData]);
+
+  useEffect(() => {
+    if (!currentRoomOccupantsData || currentRoomOccupantsData.length == 0) {
+      return;
+    }
+
+    for (let i = 0; i < currentRoomOccupantsData.length; i++) {
+      if (currentRoomOccupantsData[i].email == localStorage.getItem("email")) {
+        setIsUserBroadcasting(currentRoomOccupantsData[i].isBroadcasting);
         break;
       }
     }
@@ -126,7 +142,7 @@ const Home = ({
                   : "p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
               }
               onClick={() => {
-                if (isUserRequestingAudioControls) {
+                if (isUserRequestingAudioControls || isUserBroadcasting) {
                   return;
                 }
 
@@ -243,6 +259,7 @@ const Home = ({
                 occupantData={currentRoomOccupantsData[0]}
                 currentRoomData={currentRoomData}
                 isRoomOwner={isRoomOwner}
+                handleAudioControlRequest={handleAudioControlRequest}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[0] == undefined && (
@@ -253,6 +270,7 @@ const Home = ({
                 occupantData={currentRoomOccupantsData[1]}
                 currentRoomData={currentRoomData}
                 isRoomOwner={isRoomOwner}
+                handleAudioControlRequest={handleAudioControlRequest}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[1] == undefined && (
@@ -265,6 +283,7 @@ const Home = ({
                 occupantData={currentRoomOccupantsData[2]}
                 currentRoomData={currentRoomData}
                 isRoomOwner={isRoomOwner}
+                handleAudioControlRequest={handleAudioControlRequest}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[2] == undefined && (
@@ -275,6 +294,7 @@ const Home = ({
                 occupantData={currentRoomOccupantsData[3]}
                 currentRoomData={currentRoomData}
                 isRoomOwner={isRoomOwner}
+                handleAudioControlRequest={handleAudioControlRequest}
               ></RoomOccupantCard>
             )}
             {currentRoomOccupantsData[3] == undefined && (

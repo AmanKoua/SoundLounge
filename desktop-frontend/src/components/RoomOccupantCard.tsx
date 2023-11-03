@@ -4,12 +4,14 @@ interface Props {
   occupantData: any;
   currentRoomData: any;
   isRoomOwner: boolean;
+  handleAudioControlRequest: (id: string, isAccepted: boolean) => Promise<void>;
 }
 
 const RoomOccupantCard = ({
   occupantData,
   currentRoomData,
   isRoomOwner,
+  handleAudioControlRequest,
 }: Props) => {
   const divRef = useRef(null);
   const [midPoint, setMidPoint] = useState(0);
@@ -82,7 +84,16 @@ const RoomOccupantCard = ({
           setAudioControlApprovalState("");
         }}
         onClick={() => {
-          alert(audioControlApprovalState);
+          if (!isRoomOwner) {
+            return;
+          }
+
+          handleAudioControlRequest(
+            occupantData.id,
+            audioControlApprovalState == "Accept request"
+          );
+
+          setAudioControlApprovalState("");
         }}
       >
         <p className="w-max h-max mt-auto mb-auto p-1">

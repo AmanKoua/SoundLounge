@@ -595,6 +595,17 @@ function App() {
     socket.emit("user-request-audio-control");
   };
 
+  const handleAudioControlRequest = async (id: string, isAccepted: boolean) => {
+    console.log(id, isAccepted);
+
+    const payload = {
+      id: id,
+      isAccepted: isAccepted,
+    };
+
+    socket.emit("user-handle-audio-control-request", payload);
+  };
+
   const getFriendsList = () => {
     if (!socket) {
       alert("Cannot get friends list because socket is not initialized!");
@@ -748,6 +759,7 @@ function App() {
                     leaveRoom={leaveRoom}
                     joinRoom={joinRoom}
                     requestAudioControl={requestAudioControl}
+                    handleAudioControlRequest={handleAudioControlRequest}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}

@@ -712,6 +712,60 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-handle-audio-control-request
+
+        socket.on("user-handle-audio-control-request", async (payload) => {
+
+            let occupants = io.sockets.adapter.rooms.get(`${socket.currentRoom}`); // retrieves the set of socket IDs currently in the given room
+            if (occupants) { // occupants is undefined if room is empty
+
+                let occupantsIterator = occupants.values(); // will only return an occupants iterator if not undefined
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+                    temp = occupantsIterator.next();
+
+                    if (temp.value == undefined || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
+
+                    if (tempSocket.userId == payload.id) {
+                        tempSocket.isRequestingAudioControl = false;
+
+                        if (payload.isAccepted) {
+                            tempSocket.isBroadcasting = true;
+                        }
+                        else {
+                            tempSocket.isBroadcasting = false;
+                        }
+                    }
+                    else {
+                        if (payload.isAccepted) {
+                            tempSocket.isBroadcasting = false;
+                            tempSocket.isRequestingAudioControl = false;
+                        }
+                    }
+
+                    // socket.userId = user._id.toString();
+                    // socket.email = user.email;
+                    // socket.isBroadcasting = false;
+                    // socket.isRequestingAudioControl = false;
+                    // socket.isOwner = undefined;
+                    // socket.currentRoom = undefined;
+
+                }
+
+                socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+                return;
+
+            }
+
+        })
+
         // user-get-room-state
 
         socket.on("user-get-room-state", async (payload) => {
