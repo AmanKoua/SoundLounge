@@ -12,6 +12,7 @@ interface Props {
   currentRoomOccupantsData: any;
   currentRoomData: any;
   userRoomData: any;
+  userRoomOccupancyData: Object;
   newRoom: RoomData;
   userCreateRoomResponse: any;
   userEditRoomResponse: any;
@@ -33,6 +34,7 @@ const Home = ({
   currentRoomOccupantsData,
   currentRoomData,
   userRoomData,
+  userRoomOccupancyData,
   newRoom,
   userCreateRoomResponse,
   userEditRoomResponse,
@@ -114,7 +116,7 @@ const Home = ({
             id={room.id}
             name={room.name}
             description={room.description}
-            capacity={"0/4"}
+            userRoomOccupancyData={userRoomOccupancyData}
             idx={idx}
             setCurrentRoom={setCurrentRoom}
             setIsRoomModalDisplayed={setIsRoomModalDisplayed}

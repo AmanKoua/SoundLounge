@@ -343,7 +343,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
-            // TODO : Cannot create new objectID based on roomId? BSON bug
             const userRoom = await Room.findOne({ _id: roomId });
 
             if (!userRoom) {
@@ -479,6 +478,30 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
         })
 
+        // user-room-occupancy
+
+        socket.on("user-room-occupancy", async (payload) => {
+
+            const responsePayload = {};
+
+            for (let i = 0; i < payload.length; i++) {
+                let occupants = io.sockets.adapter.rooms.get(`${payload[i]}`); // retrieves the set of socket IDs currently in the given room
+
+                if (!occupants) {
+                    responsePayload[payload[i]] = 0;
+                }
+                else {
+                    let occupantCount = Array.from(occupants).length;
+                    responsePayload[payload[i]] = occupantCount;
+                }
+
+            }
+
+            socket.emit("user-room-occupancy-response", generateResponsePayload("message", responsePayload, 200));
+            return;
+
+        })
+
         // user-join-room
 
         socket.on("user-join-room", async (payload) => {
@@ -609,6 +632,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 socket.currentRoom = payload.roomId;
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
 
+
                 const selfProfileSlice = {
                     email: user.email,
                     id: user._id.toString(),
@@ -679,6 +703,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                     }
 
                     socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+
+
                     await socket.leave(temp.value);
                 }
 
@@ -712,6 +738,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                     }
 
                     socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+
+
                 }
             }
 
@@ -765,6 +793,8 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 }
 
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+
+
                 return;
 
             }
