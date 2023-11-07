@@ -22,6 +22,14 @@ const RoomCard = ({
   joinRoom,
 }: roomCardProps) => {
   const generateOccupancyText = (): string => {
+    if (
+      !userRoomOccupancyData ||
+      !userRoomOccupancyData.data ||
+      !userRoomOccupancyData.data[id]
+    ) {
+      return "0 / 4";
+    }
+
     if (userRoomOccupancyData.data[id] == undefined) {
       return "0 / 4";
     } else {
