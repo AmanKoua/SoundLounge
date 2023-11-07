@@ -117,6 +117,7 @@ const Home = ({
             name={room.name}
             description={room.description}
             userRoomOccupancyData={userRoomOccupancyData}
+            ownerEmail={room.ownerEmail}
             idx={idx}
             setCurrentRoom={setCurrentRoom}
             setIsRoomModalDisplayed={setIsRoomModalDisplayed}
