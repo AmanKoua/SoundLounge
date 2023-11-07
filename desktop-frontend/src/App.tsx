@@ -66,7 +66,7 @@ function App() {
   const audioPacketLength = 750;
   let isAudioBuffering = true;
   let audioBufferQueue = [];
-  let bufferLength = 15;
+  let bufferLength = 10;
   let prevAudioElement = undefined;
   let currentAudioPlayerId = "audioPlayer1"; // audioPlayer1 or audioPlayer2
 
