@@ -34,7 +34,7 @@ const RoomOccupantCard = ({
   }, [divRef]);
 
   useEffect(() => {
-    console.log(occupantData.isRequestingAudioControl, occupantData.email);
+    // console.log(occupantData.isRequestingAudioControl, occupantData.email);
 
     setIsPendingAudioControlResponse(occupantData.isRequestingAudioControl);
 

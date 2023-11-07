@@ -45,6 +45,7 @@ function App() {
     useState<any>(undefined);
   let [currentRoomData, setCurrentRoomData] = useState<any>(undefined);
   let [userRoomData, setUserRoomData] = useState<any>([]); // Room data retrieved from the backend will be placed here
+  let [userRoomOccupancyData, setUserRoomOccupancyData] = useState<Object>({});
   const [newRoom, setNewRoom] = useState({
     name: "",
     description: "",
@@ -109,6 +110,27 @@ function App() {
       }
     }
   }, audioPacketLength);
+
+  // Ping the backend every 5 seconds for the number of occupants in rooms that the user has access to
+  useEffect(() => {
+    const getRoomOccupancyInterval = setInterval(() => {
+      if (!socket || !userRoomData || userRoomData.length == 0) {
+        return;
+      }
+
+      let userRoomIds = [];
+
+      for (let i = 0; i < userRoomData.length; i++) {
+        userRoomIds.push(userRoomData[i].id);
+      }
+
+      socket.emit("user-room-occupancy", userRoomIds);
+    }, 5000);
+
+    return () => {
+      clearInterval(getRoomOccupancyInterval);
+    };
+  }, [socket, userRoomData]);
 
   useEffect(() => {
     // Initial connection to socket
@@ -262,6 +284,12 @@ function App() {
         socket.emit("user-get-room-state");
       });
 
+      // Socket - user-room-occupancy-response
+
+      socket.on("user-room-occupancy-response", (payload) => {
+        setUserRoomOccupancyData(payload);
+      });
+
       // Socket - user-get-room-state-response
 
       socket.on("user-get-room-state-response", (payload) => {
@@ -331,8 +359,8 @@ function App() {
       // Socket - leave room response
 
       socket.on("user-leave-room-response", (payload) => {
-        console.log("Leave room response payload : ");
-        console.log(payload);
+        // console.log("Leave room response payload : ");
+        // console.log(payload);
       });
 
       // Socket - receive create room response
@@ -801,6 +829,7 @@ function App() {
                     currentRoomOccupantsData={currentRoomOccupantsData}
                     currentRoomData={currentRoomData}
                     userRoomData={userRoomData}
+                    userRoomOccupancyData={userRoomOccupancyData}
                     newRoom={newRoom}
                     userCreateRoomResponse={userCreateRoomResponse}
                     userEditRoomResponse={userEditRoomResponse}

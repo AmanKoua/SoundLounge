@@ -4,7 +4,7 @@ interface roomCardProps {
   id: string;
   name: string;
   description: string;
-  capacity: string;
+  userRoomOccupancyData: Object;
   idx: number;
   setCurrentRoom: (val: number) => void;
   setIsRoomModalDisplayed: (val: boolean) => void;
@@ -15,12 +15,20 @@ const RoomCard = ({
   id,
   name,
   description,
-  capacity,
+  userRoomOccupancyData,
   idx,
   setCurrentRoom,
   setIsRoomModalDisplayed,
   joinRoom,
 }: roomCardProps) => {
+  const generateOccupancyText = (): string => {
+    if (userRoomOccupancyData.data[id] == undefined) {
+      return "0 / 4";
+    } else {
+      return `${userRoomOccupancyData.data[id]} / 4`;
+    }
+  };
+
   return (
     <div className="w-9/12 h-32 border-2 border-black rounded-lg overflow-hidden ml-auto mr-auto mt-5">
       <div className="w-full h-3/6 flex justify-start">
@@ -31,7 +39,7 @@ const RoomCard = ({
           <h1 className="">Description: {description}</h1>
         </div>
         <div className="bg-sky-500 w-2/12 h-full p-2 overflow-hidden">
-          <h1 className="">{capacity}</h1>
+          <h1 className="">{generateOccupancyText()}</h1>
         </div>
       </div>
       <div className="w-full h-3/6 flex justify-start">
