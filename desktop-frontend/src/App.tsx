@@ -86,6 +86,11 @@ function App() {
     });
 
     const audioElement = document.getElementById(currentAudioPlayerId);
+
+    if (!audioElement) {
+      return;
+    }
+
     audioElement.src = URL.createObjectURL(blob);
     prevAudioElement = audioElement;
 

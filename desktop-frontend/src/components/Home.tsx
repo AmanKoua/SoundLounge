@@ -214,47 +214,9 @@ const Home = ({
             setNewRoom={setNewRoom}
           ></RoomModal>
         )}
-        <h1
-          onClick={() => {
-            // window.electronAPI.triggerMainMessage();
-          }}
-          className="w-max ml-auto mr-auto text-3xl font-light"
-        >
+        <h1 className="w-max ml-auto mr-auto text-3xl font-light">
           SoundLounge
         </h1>
-        <div className="w-max ml-auto mr-auto mt-8">
-          <h1>Toggle app mode</h1>
-          <select
-            onChange={(e) => {
-              const option = e.target.value;
-              if (option === "Broadcast") {
-                // setIsBroadcasting(true);
-              } else {
-                // setIsBroadcasting(false);
-              }
-            }}
-            className="w-full ml-auto mr-auto mt-5 shadow-lg"
-          >
-            <option value="Invalid">Select mode</option>
-            <option value="Broadcast">Broadcast</option>
-            <option value="Receive">Receive</option>
-          </select>
-        </div>
-        {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
-        <audio className="tempAudioHolder"></audio>
-        <audio
-          id="audioPlayer1"
-          controls
-          className="ml-auto mr-auto mt-5"
-        ></audio>
-        <audio
-          id="audioPlayer2"
-          controls
-          className="ml-auto mr-auto mt-5"
-        ></audio>
-        <div className="w-10/12 h-5 ml-auto mr-auto border-b-2 border-black">
-          {" "}
-        </div>
         {generateRoomCards()}
         <div className="w-max h-max ml-auto mr-auto">
           <button
