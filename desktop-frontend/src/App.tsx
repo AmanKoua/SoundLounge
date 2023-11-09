@@ -151,14 +151,14 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        // setSocket(
-        //   io("http://localhost:8080", {
-        //     extraHeaders: {
-        //       "soundLounge-auth-test": "Aman was here 123",
-        //     },
-        //   })
-        // ); // local testing
-        setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
+        setSocket(
+          io("http://localhost:8080", {
+            extraHeaders: {
+              "soundLounge-auth-test": "Aman was here 123",
+            },
+          })
+        ); // local testing
+        // setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");
         clearInterval(getAudioStreamInterval);

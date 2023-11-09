@@ -12,6 +12,15 @@ const User = require("./userModel");
 const Room = require("./roomModel");
 const { ObjectId } = require("mongodb");
 
+/*
+    rotationTimerObject will be used to declare setIntervals in a 
+    global scope for automatic audio control rotation. 
+
+    Intervals will be set and cleared on this object
+*/
+
+const rotationTimerObject = {};
+
 let generateRandomString = (length) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let randomString = "";
@@ -628,10 +637,69 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             if (occupantsList.length < 4) {
+
                 await socket.join(`${payload.roomId}`);
+
+                if (tempRoom.audioControlMode == 1) { // If the room is in automatic rotation
+                    if (occupantsList.length == 0) {
+
+                        socket.isBroadcasting = true;
+
+                        rotationTimerObject[`${payload.roomId}`] = setInterval(() => { // rotate audio control for user
+
+                            console.log(` --------- ${payload.roomId} rotation ${tempRoom.rotationTimer} ---------------`);
+
+                            const tempOccupants = io.sockets.adapter.rooms.get(`${payload.roomId}`); // retrieves the set of socket IDs currently in the given room
+
+                            if (!tempOccupants) {
+                                clearInterval(rotationTimerObject[`${payload.roomId}`]);
+                                return;
+                            }
+
+                            let tempOccupantsArray = Array.from(tempOccupants);
+                            let isBroadcasterFound = false;
+                            let isRotated = false;
+                            let iteration = 0;
+
+                            if (tempOccupantsArray.length == 0) {
+                                return;
+                            }
+
+                            while (!isBroadcasterFound && !isRotated) { // Cycle and allocated broadcasting rights to next user
+
+                                if (iteration > 10) {
+                                    break;
+                                }
+
+                                let tempSocket = io.sockets.sockets.get(tempOccupantsArray[iteration]); // retrieve socket by socketId
+
+                                if (!tempSocket) {
+                                    tempOccupantsArray.splice(iteration, 1);
+                                    continue;
+                                }
+
+                                if (isBroadcasterFound) {
+                                    tempSocket.isBroadcasting = true;
+                                    isRotated = true;
+                                    break;
+                                }
+
+                                if (tempSocket.isBroadcasting) {
+                                    tempSocket.isBroadcasting = false;
+                                    isBroadcasterFound = true;
+                                }
+
+                                iteration++;
+                            }
+
+
+                        }, tempRoom.rotationTimer * 1000 * 10) // TODO : Replace "10" with "60" for a full minute after testing is completed
+
+                    }
+                }
+
                 socket.currentRoom = payload.roomId;
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
-
 
                 const selfProfileSlice = {
                     email: user.email,
@@ -793,7 +861,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 }
 
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
-
 
                 return;
 

@@ -23,7 +23,7 @@ const roomSchema = new Schema({
         unique: false,
     },
 
-    audioControlMode: {
+    audioControlMode: { // 0 Owner grants authorization. 1 automatic rotation
         type: Number,
         required: true,
         unique: false,
