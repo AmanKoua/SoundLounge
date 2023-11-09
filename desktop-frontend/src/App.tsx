@@ -66,7 +66,7 @@ function App() {
   const audioPacketLength = 750;
   let isAudioBuffering = true;
   let audioBufferQueue = [];
-  let bufferLength = 10;
+  let bufferLength = 5;
   let prevAudioElement = undefined;
   let currentAudioPlayerId = "audioPlayer1"; // audioPlayer1 or audioPlayer2
 
@@ -151,13 +151,8 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        setSocket(
-          io("http://localhost:8080", {
-            extraHeaders: {
-              "soundLounge-auth-test": "Aman was here 123",
-            },
-          })
-        ); // local testing
+        console.log("------------- socket set -------------------");
+        setSocket(io("http://localhost:8080")); // local testing
         // setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");

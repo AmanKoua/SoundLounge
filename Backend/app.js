@@ -53,6 +53,8 @@ const io = new Server({
 
 mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb cluster
 
+    console.log("MongoDB server connected to!");
+
     io.on('connection', (socket) => {
 
         console.log('User connected to socket.io server!');
@@ -645,55 +647,57 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
 
                         socket.isBroadcasting = true;
 
-                        rotationTimerObject[`${payload.roomId}`] = setInterval(() => { // rotate audio control for user
-
-                            console.log(` --------- ${payload.roomId} rotation ${tempRoom.rotationTimer} ---------------`);
+                        // rotationTimerObject[`${payload.roomId}`] = setInterval(() => { // rotate audio control for user
+                        const tempRoomRotationInterval = setInterval(() => { // rotate audio control for user
 
                             const tempOccupants = io.sockets.adapter.rooms.get(`${payload.roomId}`); // retrieves the set of socket IDs currently in the given room
 
                             if (!tempOccupants) {
-                                clearInterval(rotationTimerObject[`${payload.roomId}`]);
+                                // clearInterval(rotationTimerObject[`${payload.roomId}`]);
+                                clearInterval(tempRoomRotationInterval);
                                 return;
                             }
 
                             let tempOccupantsArray = Array.from(tempOccupants);
+                            let hasOneIterationRun = false;
                             let isBroadcasterFound = false;
                             let isRotated = false;
                             let iteration = 0;
+                            let iterationCap = tempOccupantsArray.length + 1;
 
-                            if (tempOccupantsArray.length == 0) {
+                            if (tempOccupantsArray.length == 0 || tempOccupantsArray.length == 1) {
                                 return;
                             }
 
-                            while (!isBroadcasterFound && !isRotated) { // Cycle and allocated broadcasting rights to next user
+                            for (let i = 0; i < tempOccupantsArray.length + 1; i++) { // rotate audio control among sockets
 
-                                if (iteration > 10) {
-                                    break;
-                                }
-
-                                let tempSocket = io.sockets.sockets.get(tempOccupantsArray[iteration]); // retrieve socket by socketId
+                                let tempSocket = io.sockets.sockets.get(tempOccupantsArray[i % tempOccupantsArray.length]); // retrieve socket by socketId
 
                                 if (!tempSocket) {
-                                    tempOccupantsArray.splice(iteration, 1);
                                     continue;
+                                }
+
+                                if (i % tempOccupantsArray.length == 0 && i > 0) {
+                                    tempSocket.isBroadcasting = true;
+                                    break;
                                 }
 
                                 if (isBroadcasterFound) {
                                     tempSocket.isBroadcasting = true;
-                                    isRotated = true;
                                     break;
                                 }
 
                                 if (tempSocket.isBroadcasting) {
-                                    tempSocket.isBroadcasting = false;
                                     isBroadcasterFound = true;
+                                    tempSocket.isBroadcasting = false;
+                                    continue;
                                 }
 
-                                iteration++;
                             }
 
+                            socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
 
-                        }, tempRoom.rotationTimer * 1000 * 10) // TODO : Replace "10" with "60" for a full minute after testing is completed
+                        }, tempRoom.rotationTimer * 60 * 1000)
 
                     }
                 }

@@ -217,6 +217,11 @@ const Home = ({
         <h1 className="w-max ml-auto mr-auto text-3xl font-light">
           SoundLounge
         </h1>
+        <audio
+          id="tempAudioHolder"
+          controls
+          className="ml-auto mr-auto mt-5 tempAudioHolder"
+        ></audio>
         {generateRoomCards()}
         <div className="w-max h-max ml-auto mr-auto">
           <button
