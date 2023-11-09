@@ -839,6 +839,7 @@ function App() {
                     joinRoom={joinRoom}
                     requestAudioControl={requestAudioControl}
                     handleAudioControlRequest={handleAudioControlRequest}
+                    setCurrentRoomData={setCurrentRoomData}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}

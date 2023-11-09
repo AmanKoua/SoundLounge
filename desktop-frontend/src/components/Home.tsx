@@ -22,6 +22,7 @@ interface Props {
   joinRoom: (val: string) => Promise<void>;
   requestAudioControl: () => void;
   handleAudioControlRequest: (id: string, isAccepted: boolean) => Promise<void>;
+  setCurrentRoomData: (val: any) => any;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -44,6 +45,7 @@ const Home = ({
   joinRoom,
   requestAudioControl,
   handleAudioControlRequest,
+  setCurrentRoomData,
   createNewRoom,
   editRoom,
   deleteRoom,
