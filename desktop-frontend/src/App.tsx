@@ -504,7 +504,20 @@ function App() {
   };
 
   const logout = async () => {
+    setIsBroadcasting(false);
+    setIsInRoom(false);
+    // Clear system room and authorization state
+    setUserSignupResponse(undefined);
+    setUserLoginResponse(undefined);
+    setUserJoinRoomResponse(undefined);
+    setUserCreateRoomResponse(undefined);
+    setUserEditRoomResponse(undefined);
+    setUserDeleteRoomResponse(undefined);
+    setCurrentRoomOccupantsData(undefined);
+    setCurrentRoomData(undefined);
     setUserRoomData([]);
+    setUserRoomOccupancyData({});
+    // Friends page data
     setSendFriendRequestResponse("");
     setFriendRequests("");
     setHandleFriendRequestResponse("");
