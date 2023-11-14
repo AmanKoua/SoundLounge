@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import RoomCard from "./RoomCard";
 import RoomModal from "./RoomModal";
@@ -8,6 +9,7 @@ import BlankRoomOccupantCard from "./BlankRoomOccupantCard";
 import { RoomData } from "../customTypes";
 
 interface Props {
+  isConnected: boolean;
   isInRoom: boolean;
   currentRoomOccupantsData: any;
   currentRoomData: any;
@@ -31,6 +33,7 @@ interface Props {
 }
 
 const Home = ({
+  isConnected,
   isInRoom,
   currentRoomOccupantsData,
   currentRoomData,
@@ -59,6 +62,19 @@ const Home = ({
   const [isUserRequestingAudioControls, setIsUserRequestionAudioControls] =
     useState(false);
   const [isUserBroadcasting, setIsUserBroadcasting] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wait for socket connection to be established, and for tempaudioholder to contain the system audio stream
+
+    if (!isConnected) {
+      return;
+    }
+
+    if (!localStorage.getItem("user")) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     let storedUserEmail = localStorage.getItem("email");

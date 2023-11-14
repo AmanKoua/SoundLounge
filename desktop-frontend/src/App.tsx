@@ -844,6 +844,7 @@ function App() {
                 path="/"
                 element={
                   <Home
+                    isConnected={isConnected}
                     isInRoom={isInRoom}
                     currentRoomOccupantsData={currentRoomOccupantsData}
                     currentRoomData={currentRoomData}
