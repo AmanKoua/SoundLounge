@@ -713,7 +713,7 @@ function App() {
     const userToken = localStorage.getItem("user");
 
     if (!userToken) {
-      alert("Must be signed in to get friends list!");
+      // alert("Must be signed in to get friends list!");
       return;
     }
 
@@ -754,7 +754,7 @@ function App() {
     const userToken = localStorage.getItem("user");
 
     if (!userToken) {
-      alert("Must be signed in to get friend requests!");
+      // alert("Must be signed in to get friend requests!");
       return;
     }
 
