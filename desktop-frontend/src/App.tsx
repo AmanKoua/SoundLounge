@@ -505,6 +505,12 @@ function App() {
 
   const logout = async () => {
     setUserRoomData([]);
+    setSendFriendRequestResponse("");
+    setFriendRequests("");
+    setHandleFriendRequestResponse("");
+    setGetFriendsListResponse("");
+    setRemoveFriendResponse("");
+    setRemoveRequestCardResponse("");
     localStorage.removeItem("user");
   };
 
