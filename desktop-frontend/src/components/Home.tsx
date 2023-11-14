@@ -235,20 +235,27 @@ const Home = ({
         </h1>
         <audio
           id="tempAudioHolder"
-          controls
+          // controls // disable controls to make the audio tag invisible
           className="ml-auto mr-auto mt-5 tempAudioHolder"
         ></audio>
         {generateRoomCards()}
         <div className="w-max h-max ml-auto mr-auto">
-          <button
-            className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
-            onClick={() => {
-              setCurrentRoomData(newRoom);
-              setIsRoomModalDisplayed(true);
-            }}
-          >
-            Add new room
-          </button>
+          {localStorage.getItem("user") && (
+            <button
+              className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
+              onClick={() => {
+                setCurrentRoomData(newRoom);
+                setIsRoomModalDisplayed(true);
+              }}
+            >
+              Add new room
+            </button>
+          )}
+          {!localStorage.getItem("user") && (
+            <h1 className="text-2xl mt-10 border-b border-black">
+              Please log in to access your account and rooms
+            </h1>
+          )}
         </div>
       </div>
     );

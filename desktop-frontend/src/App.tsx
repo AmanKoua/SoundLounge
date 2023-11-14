@@ -156,6 +156,7 @@ function App() {
         // setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");
+
         clearInterval(getAudioStreamInterval);
       }
     }, 500);
@@ -889,6 +890,7 @@ function App() {
                 path="friends"
                 element={
                   <FriendsPage
+                    isConnected={isConnected}
                     getFriendsList={getFriendsList}
                     sendFriendRequest={sendFriendRequest}
                     getFriendRequests={getFriendRequests}

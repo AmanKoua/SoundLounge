@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
+  isConnected: boolean;
   getFriendsList: () => void;
   sendFriendRequest: (val: string) => void;
   getFriendRequests: () => void;
@@ -21,6 +23,7 @@ interface Props {
 }
 
 const FriendsPage = ({
+  isConnected,
   getFriendsList,
   sendFriendRequest,
   getFriendRequests,
@@ -42,6 +45,19 @@ const FriendsPage = ({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wait for socket connection to be established, and for tempaudioholder to contain the system audio stream
+
+    if (!isConnected) {
+      return;
+    }
+
+    if (!localStorage.getItem("user")) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     getFriendRequests();
