@@ -360,8 +360,8 @@ function App() {
       // Socket - leave room response
 
       socket.on("user-leave-room-response", (payload) => {
-        // console.log("Leave room response payload : ");
-        // console.log(payload);
+        // set is in room to false in the case that the room was deleted and the user was kicked
+        setIsInRoom(false);
       });
 
       // Socket - receive create room response

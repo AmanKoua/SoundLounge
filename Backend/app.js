@@ -308,6 +308,37 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 return;
             }
 
+            // TODO : Kick all users from the room upon deletion!
+
+            let occupants = io.sockets.adapter.rooms.get(`${roomId}`); // retrieves the set of socket IDs currently in the given room
+
+            if (occupants) { // occupants is undefined if room is empty
+
+                let occupantsIterator = occupants.values(); // will only return an occupants iterator if not undefined
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+                    temp = occupantsIterator.next();
+
+                    if (temp.value == undefined || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
+
+                    tempSocket.isBroadcasting = false;
+                    tempSocket.isRequestingAudioControl = false;
+                    tempSocket.isOwner = undefined;
+                    tempSocket.currentRoom = undefined;
+
+                    await tempSocket.leave(roomId);
+                    tempSocket.emit("user-leave-room-response", generateResponsePayload("message", "Kicked from room upon room deletion!", 200));
+                }
+
+            }
+
             socket.emit("user-delete-room-response", generateResponsePayload("message", "room deleted successfully!", 200));
             return;
 
