@@ -45,6 +45,7 @@ const FriendsPage = ({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
+  const [inputBorderColor, setInputBorderColor] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,6 +68,7 @@ const FriendsPage = ({
   useEffect(() => {
     if (sendFriendRequestResponse.type == "error") {
       setError(sendFriendRequestResponse.data);
+      setInputBorderColor("border-2 border-red-400");
     } else {
       setMessage(sendFriendRequestResponse.data);
     }
@@ -238,6 +240,7 @@ const FriendsPage = ({
         <input
           type="text"
           placeholder="Enter a user's email"
+          className={inputBorderColor}
           value={friendEmail}
           onChange={(e) => {
             setFriendEmail(e.target.value);
@@ -246,6 +249,7 @@ const FriendsPage = ({
         <button
           className="font-bold text-black border border-blue-300 p-1 rounded-sm shadow-md hover:shadow-lg"
           onClick={() => {
+            setInputBorderColor("");
             sendFriendRequest(friendEmail);
           }}
         >
