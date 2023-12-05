@@ -528,6 +528,22 @@ function App() {
     localStorage.removeItem("user");
   };
 
+  const refreshRoomsList = () => {
+    if (!socket) {
+      alert("Cannot refresh rooms because socket is not initialized!");
+      return;
+    }
+
+    const token = localStorage.getItem("user");
+
+    if (!token) {
+      alert("Cannot refresh rooms becasue user is not logged in!");
+      return;
+    }
+
+    socket.emit("user-get-rooms", { token: token });
+  };
+
   const createNewRoom = async (room: RoomData) => {
     setUserCreateRoomResponse(undefined);
     setUserEditRoomResponse(undefined);
@@ -861,6 +877,7 @@ function App() {
                     requestAudioControl={requestAudioControl}
                     handleAudioControlRequest={handleAudioControlRequest}
                     setCurrentRoomData={setCurrentRoomData}
+                    refreshRoomsList={refreshRoomsList}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}
