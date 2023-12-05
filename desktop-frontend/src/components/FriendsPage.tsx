@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
+  isConnected: boolean;
   getFriendsList: () => void;
   sendFriendRequest: (val: string) => void;
   getFriendRequests: () => void;
@@ -21,6 +23,7 @@ interface Props {
 }
 
 const FriendsPage = ({
+  isConnected,
   getFriendsList,
   sendFriendRequest,
   getFriendRequests,
@@ -42,6 +45,20 @@ const FriendsPage = ({
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [friendEmail, setFriendEmail] = useState("");
+  const [inputBorderColor, setInputBorderColor] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wait for socket connection to be established, and for tempaudioholder to contain the system audio stream
+
+    if (!isConnected) {
+      return;
+    }
+
+    if (!localStorage.getItem("user")) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     getFriendRequests();
@@ -51,6 +68,7 @@ const FriendsPage = ({
   useEffect(() => {
     if (sendFriendRequestResponse.type == "error") {
       setError(sendFriendRequestResponse.data);
+      setInputBorderColor("border-2 border-red-400");
     } else {
       setMessage(sendFriendRequestResponse.data);
     }
@@ -222,6 +240,7 @@ const FriendsPage = ({
         <input
           type="text"
           placeholder="Enter a user's email"
+          className={inputBorderColor}
           value={friendEmail}
           onChange={(e) => {
             setFriendEmail(e.target.value);
@@ -230,6 +249,7 @@ const FriendsPage = ({
         <button
           className="font-bold text-black border border-blue-300 p-1 rounded-sm shadow-md hover:shadow-lg"
           onClick={() => {
+            setInputBorderColor("");
             sendFriendRequest(friendEmail);
           }}
         >

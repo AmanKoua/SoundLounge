@@ -66,7 +66,7 @@ function App() {
   const audioPacketLength = 750;
   let isAudioBuffering = true;
   let audioBufferQueue = [];
-  let bufferLength = 10;
+  let bufferLength = 5;
   let prevAudioElement = undefined;
   let currentAudioPlayerId = "audioPlayer1"; // audioPlayer1 or audioPlayer2
 
@@ -86,6 +86,11 @@ function App() {
     });
 
     const audioElement = document.getElementById(currentAudioPlayerId);
+
+    if (!audioElement) {
+      return;
+    }
+
     audioElement.src = URL.createObjectURL(blob);
     prevAudioElement = audioElement;
 
@@ -146,16 +151,12 @@ function App() {
         setAudioStreamSettings(
           tempAudio.srcObject.getAudioTracks()[0].getSettings()
         );
-        // setSocket(
-        //   io("http://localhost:8080", {
-        //     extraHeaders: {
-        //       "soundLounge-auth-test": "Aman was here 123",
-        //     },
-        //   })
-        // ); // local testing
-        setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
+        console.log("------------- socket set -------------------");
+        setSocket(io("http://localhost:8080")); // local testing
+        // setSocket(io("https://soundlounge-1.uk.r.appspot.com")); // Deployment testing
         setIsConnected(true);
         console.log("Audio Stream set!");
+
         clearInterval(getAudioStreamInterval);
       }
     }, 500);
@@ -359,8 +360,8 @@ function App() {
       // Socket - leave room response
 
       socket.on("user-leave-room-response", (payload) => {
-        // console.log("Leave room response payload : ");
-        // console.log(payload);
+        // set is in room to false in the case that the room was deleted and the user was kicked
+        setIsInRoom(false);
       });
 
       // Socket - receive create room response
@@ -504,7 +505,26 @@ function App() {
   };
 
   const logout = async () => {
+    setIsBroadcasting(false);
+    setIsInRoom(false);
+    // Clear system room and authorization state
+    setUserSignupResponse(undefined);
+    setUserLoginResponse(undefined);
+    setUserJoinRoomResponse(undefined);
+    setUserCreateRoomResponse(undefined);
+    setUserEditRoomResponse(undefined);
+    setUserDeleteRoomResponse(undefined);
+    setCurrentRoomOccupantsData(undefined);
+    setCurrentRoomData(undefined);
     setUserRoomData([]);
+    setUserRoomOccupancyData({});
+    // Friends page data
+    setSendFriendRequestResponse("");
+    setFriendRequests("");
+    setHandleFriendRequestResponse("");
+    setGetFriendsListResponse("");
+    setRemoveFriendResponse("");
+    setRemoveRequestCardResponse("");
     localStorage.removeItem("user");
   };
 
@@ -693,7 +713,7 @@ function App() {
     const userToken = localStorage.getItem("user");
 
     if (!userToken) {
-      alert("Must be signed in to get friends list!");
+      // alert("Must be signed in to get friends list!");
       return;
     }
 
@@ -734,7 +754,7 @@ function App() {
     const userToken = localStorage.getItem("user");
 
     if (!userToken) {
-      alert("Must be signed in to get friend requests!");
+      // alert("Must be signed in to get friend requests!");
       return;
     }
 
@@ -825,6 +845,7 @@ function App() {
                 path="/"
                 element={
                   <Home
+                    isConnected={isConnected}
                     isInRoom={isInRoom}
                     currentRoomOccupantsData={currentRoomOccupantsData}
                     currentRoomData={currentRoomData}
@@ -839,6 +860,7 @@ function App() {
                     joinRoom={joinRoom}
                     requestAudioControl={requestAudioControl}
                     handleAudioControlRequest={handleAudioControlRequest}
+                    setCurrentRoomData={setCurrentRoomData}
                     createNewRoom={createNewRoom}
                     editRoom={editRoom}
                     deleteRoom={deleteRoom}
@@ -868,6 +890,7 @@ function App() {
                 path="friends"
                 element={
                   <FriendsPage
+                    isConnected={isConnected}
                     getFriendsList={getFriendsList}
                     sendFriendRequest={sendFriendRequest}
                     getFriendRequests={getFriendRequests}

@@ -12,6 +12,15 @@ const User = require("./userModel");
 const Room = require("./roomModel");
 const { ObjectId } = require("mongodb");
 
+/*
+    rotationTimerObject will be used to declare setIntervals in a 
+    global scope for automatic audio control rotation. 
+
+    Intervals will be set and cleared on this object
+*/
+
+const rotationTimerObject = {};
+
 let generateRandomString = (length) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let randomString = "";
@@ -43,6 +52,8 @@ const io = new Server({
 });
 
 mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb cluster
+
+    console.log("MongoDB server connected to!");
 
     io.on('connection', (socket) => {
 
@@ -295,6 +306,37 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             if (!isRoomDeleted) {
                 socket.emit("user-delete-room-response", generateResponsePayload("error", "No room found for given user!", 400));
                 return;
+            }
+
+            // TODO : Kick all users from the room upon deletion!
+
+            let occupants = io.sockets.adapter.rooms.get(`${roomId}`); // retrieves the set of socket IDs currently in the given room
+
+            if (occupants) { // occupants is undefined if room is empty
+
+                let occupantsIterator = occupants.values(); // will only return an occupants iterator if not undefined
+                let isFinished = false;
+                let temp = undefined;
+
+                while (!isFinished) {
+                    temp = occupantsIterator.next();
+
+                    if (temp.value == undefined || temp.done == true) {
+                        isFinished = true;
+                        break;
+                    }
+
+                    let tempSocket = io.sockets.sockets.get(temp.value); // retrieve socket by socketId
+
+                    tempSocket.isBroadcasting = false;
+                    tempSocket.isRequestingAudioControl = false;
+                    tempSocket.isOwner = undefined;
+                    tempSocket.currentRoom = undefined;
+
+                    await tempSocket.leave(roomId);
+                    tempSocket.emit("user-leave-room-response", generateResponsePayload("message", "Kicked from room upon room deletion!", 200));
+                }
+
             }
 
             socket.emit("user-delete-room-response", generateResponsePayload("message", "room deleted successfully!", 200));
@@ -628,10 +670,71 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
             }
 
             if (occupantsList.length < 4) {
+
                 await socket.join(`${payload.roomId}`);
+
+                if (tempRoom.audioControlMode == 1) { // If the room is in automatic rotation
+                    if (occupantsList.length == 0) {
+
+                        socket.isBroadcasting = true;
+
+                        // rotationTimerObject[`${payload.roomId}`] = setInterval(() => { // rotate audio control for user
+                        const tempRoomRotationInterval = setInterval(() => { // rotate audio control for user
+
+                            const tempOccupants = io.sockets.adapter.rooms.get(`${payload.roomId}`); // retrieves the set of socket IDs currently in the given room
+
+                            if (!tempOccupants) {
+                                // clearInterval(rotationTimerObject[`${payload.roomId}`]);
+                                clearInterval(tempRoomRotationInterval);
+                                return;
+                            }
+
+                            let tempOccupantsArray = Array.from(tempOccupants);
+                            let hasOneIterationRun = false;
+                            let isBroadcasterFound = false;
+                            let isRotated = false;
+                            let iteration = 0;
+                            let iterationCap = tempOccupantsArray.length + 1;
+
+                            if (tempOccupantsArray.length == 0 || tempOccupantsArray.length == 1) {
+                                return;
+                            }
+
+                            for (let i = 0; i < tempOccupantsArray.length + 1; i++) { // rotate audio control among sockets
+
+                                let tempSocket = io.sockets.sockets.get(tempOccupantsArray[i % tempOccupantsArray.length]); // retrieve socket by socketId
+
+                                if (!tempSocket) {
+                                    continue;
+                                }
+
+                                if (i % tempOccupantsArray.length == 0 && i > 0) {
+                                    tempSocket.isBroadcasting = true;
+                                    break;
+                                }
+
+                                if (isBroadcasterFound) {
+                                    tempSocket.isBroadcasting = true;
+                                    break;
+                                }
+
+                                if (tempSocket.isBroadcasting) {
+                                    isBroadcasterFound = true;
+                                    tempSocket.isBroadcasting = false;
+                                    continue;
+                                }
+
+                            }
+
+                            socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
+
+                        }, tempRoom.rotationTimer * 60 * 1000)
+
+                    }
+                }
+
                 socket.currentRoom = payload.roomId;
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
-
 
                 const selfProfileSlice = {
                     email: user.email,
@@ -793,7 +896,6 @@ mongoose.connect(process.env.MONGO_URI).then(async () => { // Connect to mongoDb
                 }
 
                 socket.broadcast.to(socket.currentRoom).emit("room-update-event", socket.email)
-
 
                 return;
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import RoomCard from "./RoomCard";
 import RoomModal from "./RoomModal";
@@ -8,6 +9,7 @@ import BlankRoomOccupantCard from "./BlankRoomOccupantCard";
 import { RoomData } from "../customTypes";
 
 interface Props {
+  isConnected: boolean;
   isInRoom: boolean;
   currentRoomOccupantsData: any;
   currentRoomData: any;
@@ -22,6 +24,7 @@ interface Props {
   joinRoom: (val: string) => Promise<void>;
   requestAudioControl: () => void;
   handleAudioControlRequest: (id: string, isAccepted: boolean) => Promise<void>;
+  setCurrentRoomData: (val: any) => any;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -30,6 +33,7 @@ interface Props {
 }
 
 const Home = ({
+  isConnected,
   isInRoom,
   currentRoomOccupantsData,
   currentRoomData,
@@ -44,6 +48,7 @@ const Home = ({
   joinRoom,
   requestAudioControl,
   handleAudioControlRequest,
+  setCurrentRoomData,
   createNewRoom,
   editRoom,
   deleteRoom,
@@ -57,6 +62,19 @@ const Home = ({
   const [isUserRequestingAudioControls, setIsUserRequestionAudioControls] =
     useState(false);
   const [isUserBroadcasting, setIsUserBroadcasting] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wait for socket connection to be established, and for tempaudioholder to contain the system audio stream
+
+    if (!isConnected) {
+      return;
+    }
+
+    if (!localStorage.getItem("user")) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     let storedUserEmail = localStorage.getItem("email");
@@ -117,6 +135,7 @@ const Home = ({
             name={room.name}
             description={room.description}
             userRoomOccupancyData={userRoomOccupancyData}
+            ownerEmail={room.ownerEmail}
             idx={idx}
             setCurrentRoom={setCurrentRoom}
             setIsRoomModalDisplayed={setIsRoomModalDisplayed}
@@ -211,58 +230,32 @@ const Home = ({
             setNewRoom={setNewRoom}
           ></RoomModal>
         )}
-        <h1
-          onClick={() => {
-            // window.electronAPI.triggerMainMessage();
-          }}
-          className="w-max ml-auto mr-auto text-3xl font-light"
-        >
+        <h1 className="w-max ml-auto mr-auto text-3xl font-light">
           SoundLounge
         </h1>
-        <div className="w-max ml-auto mr-auto mt-8">
-          <h1>Toggle app mode</h1>
-          <select
-            onChange={(e) => {
-              const option = e.target.value;
-              if (option === "Broadcast") {
-                // setIsBroadcasting(true);
-              } else {
-                // setIsBroadcasting(false);
-              }
-            }}
-            className="w-full ml-auto mr-auto mt-5 shadow-lg"
-          >
-            <option value="Invalid">Select mode</option>
-            <option value="Broadcast">Broadcast</option>
-            <option value="Receive">Receive</option>
-          </select>
-        </div>
-        {/* The audio tag is utilized to hold the audio stream retrieved by the preload script */}
-        <audio className="tempAudioHolder"></audio>
         <audio
-          id="audioPlayer1"
-          controls
-          className="ml-auto mr-auto mt-5"
+          id="tempAudioHolder"
+          // controls // disable controls to make the audio tag invisible
+          className="ml-auto mr-auto mt-5 tempAudioHolder"
         ></audio>
-        <audio
-          id="audioPlayer2"
-          controls
-          className="ml-auto mr-auto mt-5"
-        ></audio>
-        <div className="w-10/12 h-5 ml-auto mr-auto border-b-2 border-black">
-          {" "}
-        </div>
         {generateRoomCards()}
         <div className="w-max h-max ml-auto mr-auto">
-          <button
-            className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
-            onClick={() => {
-              setCurrentRoomData(newRoom);
-              setIsRoomModalDisplayed(true);
-            }}
-          >
-            Add new room
-          </button>
+          {localStorage.getItem("user") && (
+            <button
+              className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
+              onClick={() => {
+                setCurrentRoomData(newRoom);
+                setIsRoomModalDisplayed(true);
+              }}
+            >
+              Add new room
+            </button>
+          )}
+          {!localStorage.getItem("user") && (
+            <h1 className="text-2xl mt-10 border-b border-black">
+              Please log in to access your account and rooms
+            </h1>
+          )}
         </div>
       </div>
     );

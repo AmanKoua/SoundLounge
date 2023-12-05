@@ -11,6 +11,8 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
   const [message, setMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userPass, setUserPass] = useState("");
+  const [emailHighlight, setEmailHighlight] = useState("");
+  const [passwordHighlight, setPasswordHighlight] = useState("");
   const [triggerResponse, setTriggerResponse] = useState(false);
 
   const navigate = useNavigate();
@@ -41,6 +43,27 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
     }
   }, [triggerResponse]);
 
+  useEffect(() => {
+    if (!userSignupResponse) {
+      return;
+    }
+
+    if (
+      userSignupResponse.data.includes("Email") ||
+      userSignupResponse.data.includes("email")
+    ) {
+      setEmailHighlight("border-2 border-red-400");
+    }
+
+    if (
+      userSignupResponse.data.includes("password") ||
+      userSignupResponse.data.includes("Password") ||
+      userSignupResponse.data.includes("pass")
+    ) {
+      setPasswordHighlight("border-2 border-red-400");
+    }
+  }, [userSignupResponse]);
+
   return (
     <div className="bg-prodPrimary w-full sm:w-8/12 h-screen mr-auto ml-auto pt-10">
       <div className="w-7/12 mr-auto ml-auto">
@@ -51,7 +74,7 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
             <input
               placeholder="email"
               type="email"
-              className="w-full mr-auto ml-auto p-2"
+              className={"w-full mr-auto ml-auto p-2 " + emailHighlight}
               value={userEmail}
               onChange={(e) => {
                 setUserEmail(e.target.value);
@@ -65,7 +88,7 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
             <input
               placeholder="password"
               type="password"
-              className="w-full mr-auto ml-auto p-2"
+              className={"w-full mr-auto ml-auto p-2 " + passwordHighlight}
               value={userPass}
               onChange={(e) => {
                 setUserPass(e.target.value);
@@ -87,14 +110,18 @@ const Signup = ({ signup, userSignupResponse }: signupProps) => {
 
                 setMessage("");
                 setError("");
+                setEmailHighlight("");
+                setPasswordHighlight("");
 
                 if (!userEmail.includes("@")) {
                   setError('User email must contain an "@" symbol!');
+                  setEmailHighlight("border-2 border-red-400");
                   return;
                 }
 
                 if (userPass.length < 7) {
                   setError("password must be at least 7 characters long!");
+                  setPasswordHighlight("border-2 border-red-400");
                   return;
                 }
 

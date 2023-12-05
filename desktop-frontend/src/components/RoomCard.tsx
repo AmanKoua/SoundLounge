@@ -5,6 +5,7 @@ interface roomCardProps {
   name: string;
   description: string;
   userRoomOccupancyData: Object;
+  ownerEmail: string;
   idx: number;
   setCurrentRoom: (val: number) => void;
   setIsRoomModalDisplayed: (val: boolean) => void;
@@ -16,6 +17,7 @@ const RoomCard = ({
   name,
   description,
   userRoomOccupancyData,
+  ownerEmail,
   idx,
   setCurrentRoom,
   setIsRoomModalDisplayed,
@@ -59,15 +61,17 @@ const RoomCard = ({
         >
           Join Room
         </button>
-        <button
-          className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
-          onClick={() => {
-            setCurrentRoom(idx);
-            setIsRoomModalDisplayed(true);
-          }}
-        >
-          Edit Room
-        </button>
+        {ownerEmail == localStorage.getItem("email") && (
+          <button
+            className="h-4/6 mt-auto mb-auto mr-auto ml-auto p-2 border-r-black border-l-black border-t-black border-b-black rounded-xl border-2 shadow-lg block"
+            onClick={() => {
+              setCurrentRoom(idx);
+              setIsRoomModalDisplayed(true);
+            }}
+          >
+            Edit Room
+          </button>
+        )}
       </div>
     </div>
   );
