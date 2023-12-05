@@ -274,12 +274,12 @@ const Home = ({
       <div className="w-full h-screen flex flex-col justify-center">
         <audio
           id="audioPlayer1"
-          controls
+          controls // enable / disable controls to see audio tag
           className="ml-auto mr-auto mt-5"
         ></audio>
         <audio
           id="audioPlayer2"
-          controls
+          controls // enable / disable controls to see audio tag
           className="ml-auto mr-auto mt-5"
         ></audio>
         <h1 className="w-max h-max ml-auto mr-auto mb-4 text-4xl">
