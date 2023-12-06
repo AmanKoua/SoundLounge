@@ -25,6 +25,7 @@ interface Props {
   requestAudioControl: () => void;
   handleAudioControlRequest: (id: string, isAccepted: boolean) => Promise<void>;
   setCurrentRoomData: (val: any) => any;
+  refreshRoomsList: () => void;
   createNewRoom: (room: RoomData) => Promise<void>;
   editRoom: (room: RoomData, roomId: string) => Promise<void>;
   deleteRoom: (val: string) => Promise<void>;
@@ -49,6 +50,7 @@ const Home = ({
   requestAudioControl,
   handleAudioControlRequest,
   setCurrentRoomData,
+  refreshRoomsList,
   createNewRoom,
   editRoom,
   deleteRoom,
@@ -239,17 +241,27 @@ const Home = ({
           className="ml-auto mr-auto mt-5 tempAudioHolder"
         ></audio>
         {generateRoomCards()}
-        <div className="w-max h-max ml-auto mr-auto">
+        <div className="w-10/12 h-max ml-auto mr-auto flex flex-row justify-around">
           {localStorage.getItem("user") && (
-            <button
-              className="font-bold mt-3 mb-3 ml-auto mr-auto text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
-              onClick={() => {
-                setCurrentRoomData(newRoom);
-                setIsRoomModalDisplayed(true);
-              }}
-            >
-              Add new room
-            </button>
+            <>
+              <button
+                className="font-bold mt-3 mb-3 text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
+                onClick={() => {
+                  setCurrentRoomData(newRoom);
+                  setIsRoomModalDisplayed(true);
+                }}
+              >
+                Add new room
+              </button>
+              <button
+                className="font-bold mt-3 mb-3 text-black border border-black p-3 rounded-lg shadow-md hover:shadow-lg"
+                onClick={() => {
+                  refreshRoomsList();
+                }}
+              >
+                Refresh rooms list
+              </button>
+            </>
           )}
           {!localStorage.getItem("user") && (
             <h1 className="text-2xl mt-10 border-b border-black">
